@@ -15,7 +15,8 @@ void createInertiaApp({
             case name === 'Dashboard' ||
                 name.startsWith('dashboard/') ||
                 name.startsWith('tickets/') ||
-                name.startsWith('users/'):
+                name.startsWith('users/') ||
+                name.startsWith('admin/'):
                 return AppLayout;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];

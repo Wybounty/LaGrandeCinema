@@ -18,10 +18,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             { title: 'Utilisateurs', href: index.url() },
-            {
-                title: props.managedUser.name,
-                href: edit.url(props.managedUser.id),
-            },
+            { title: 'Modifier' },
         ],
     },
 });

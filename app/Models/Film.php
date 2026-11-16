@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\FilmGenre;
 use Database\Factories\FilmFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string $title
  * @property string $synopsis
  * @property int $duration
- * @property string $genre
+ * @property FilmGenre $genre
  * @property string|null $poster
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -25,6 +26,19 @@ class Film extends Model
 {
     /** @use HasFactory<FilmFactory> */
     use HasFactory;
+
+    /**
+     * @return HasMany<CinemaSession, $this>
+     */
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'genre' => FilmGenre::class,
+        ];
+    }
 
     /**
      * @return HasMany<CinemaSession, $this>
