@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\ReservationStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
@@ -13,7 +14,12 @@ class TicketController extends Controller
     public function index(Request $request): InertiaResponse
     {
         $tickets = Ticket::query()
-            ->whereHas('reservation', fn ($query) => $query->where('user_id', $request->user()->id))
+            ->whereHas(
+                'reservation',
+                fn ($query) => $query
+                    ->where('user_id', $request->user()->id)
+                    ->where('status', ReservationStatus::Confirmed),
+            )
             ->with([
                 'reservation.cinemaSession.film:id,title',
                 'reservation.cinemaSession.room:id,name',
