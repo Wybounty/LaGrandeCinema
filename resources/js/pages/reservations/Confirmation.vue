@@ -14,6 +14,7 @@ import {
 } from '@/lib/formatDuration';
 import { formatMoney } from '@/lib/formatMoney';
 import { index as filmsIndex } from '@/routes/films';
+import { index as ticketsIndex } from '@/routes/tickets';
 import type { ReservationSummary } from '@/types';
 
 defineProps<{
@@ -32,8 +33,8 @@ defineProps<{
             </CardHeader>
             <CardContent class="space-y-3 text-sm text-muted-foreground">
                 <p>
-                    Votre réservation a bien été prise en compte. Les billets QR
-                    seront disponibles dans une prochaine version.
+                    Votre réservation est confirmée. Vos billets avec QR code
+                    ont été générés et envoyés par e-mail.
                 </p>
                 <p class="font-medium text-foreground">
                     {{ reservation.session.film_title }}
@@ -50,9 +51,14 @@ defineProps<{
                     Total payé (simulation) :
                     {{ formatMoney(reservation.total_amount) }}
                 </p>
-                <Button as-child class="mt-4 w-full">
-                    <Link :href="filmsIndex.url()">Retour aux films</Link>
-                </Button>
+                <div class="mt-4 flex w-full flex-col gap-2">
+                    <Button as-child class="w-full">
+                        <Link :href="ticketsIndex.url()">Mes billets</Link>
+                    </Button>
+                    <Button as-child class="w-full" variant="outline">
+                        <Link :href="filmsIndex.url()">Retour aux films</Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     </div>
