@@ -38,6 +38,26 @@ class Reservation extends Model
         ];
     }
 
+    public function reference(): string
+    {
+        return 'R-'.str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
+    }
+
+    public static function idFromReference(string $reference): ?int
+    {
+        $reference = trim($reference);
+
+        if (preg_match('/^R-(\d+)$/i', $reference, $matches) === 1) {
+            return (int) $matches[1];
+        }
+
+        if (ctype_digit($reference)) {
+            return (int) $reference;
+        }
+
+        return null;
+    }
+
     /**
      * @return BelongsTo<User, $this>
      */

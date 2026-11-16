@@ -4,6 +4,7 @@ import {
     BookOpen,
     Calendar,
     Clapperboard,
+    ClipboardList,
     DoorOpen,
     FolderGit2,
     LayoutGrid,
@@ -27,6 +28,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as ticketsIndex } from '@/routes/tickets';
 import { index as adminFilmsIndex } from '@/routes/admin/films';
+import { index as adminReservationsIndex } from '@/routes/admin/reservations';
 import { index as adminRoomsIndex } from '@/routes/admin/rooms';
 import { index as adminSessionsIndex } from '@/routes/admin/sessions';
 import { index as usersIndex } from '@/routes/users';
@@ -67,6 +69,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                 title: 'Salles',
                 href: adminRoomsIndex.url(),
                 icon: DoorOpen,
+            },
+            {
+                title: 'Réservations',
+                href: adminReservationsIndex.url(),
+                icon: ClipboardList,
             },
             {
                 title: 'Utilisateurs',
