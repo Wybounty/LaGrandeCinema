@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowLeft, Clock, Clapperboard } from '@lucide/vue';
+import { ArrowLeft, Calendar, Clock, Clapperboard, MapPin } from '@lucide/vue';
+import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,15 +11,32 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { formatDuration } from '@/lib/formatDuration';
+import {
+    formatDuration,
+    formatSessionDate,
+    formatSessionTime,
+} from '@/lib/formatDuration';
 import { handlePosterError, posterSrc } from '@/lib/posterFallback';
 import { index as filmsIndex } from '@/routes/films';
-import type { Film } from '@/types';
+import type { Film, FilmSession } from '@/types';
 
 const props = defineProps<{
     film: Film;
+    sessions: FilmSession[];
 }>();
 
+const sessionsByDate = computed(() => {
+    const groups = new Map<string, FilmSession[]>();
+
+    for (const session of props.sessions) {
+        const date = session.starts_at.slice(0, 10);
+        const list = groups.get(date) ?? [];
+        list.push(session);
+        groups.set(date, list);
+    }
+
+    return [...groups.entries()].map(([date, items]) => ({ date, items }));
+});
 </script>
 
 <template>
@@ -80,9 +98,85 @@ const props = defineProps<{
                         <h2 class="text-lg font-semibold tracking-tight">
                             Synopsis
                         </h2>
-                        <p class="text-base leading-relaxed text-muted-foreground">
+                        <p
+                            class="text-base leading-relaxed text-muted-foreground"
+                        >
                             {{ props.film.synopsis }}
                         </p>
+                    </section>
+
+                    <Separator />
+
+                    <section class="space-y-5">
+                        <h2 class="text-lg font-semibold tracking-tight">
+                            Séances disponibles
+                        </h2>
+
+                        <div
+                            v-if="sessions.length === 0"
+                            class="rounded-lg border border-dashed border-border px-4 py-10 text-center"
+                        >
+                            <p class="font-medium">
+                                Aucune séance programmée
+                            </p>
+                        </div>
+
+                        <div v-else class="space-y-6">
+                            <div
+                                v-for="group in sessionsByDate"
+                                :key="group.date"
+                                class="space-y-3"
+                            >
+                                <h3
+                                    class="flex items-center gap-2 text-base font-semibold"
+                                >
+                                    <Calendar class="size-4 text-primary" />
+                                    {{
+                                        formatSessionDate(
+                                            group.items[0].starts_at,
+                                        )
+                                    }}
+                                </h3>
+                                <ul class="grid gap-3 sm:grid-cols-2">
+                                    <li
+                                        v-for="session in group.items"
+                                        :key="session.id"
+                                    >
+                                        <Card class="py-4">
+                                            <CardContent class="space-y-2 px-4">
+                                                <p
+                                                    class="text-sm font-medium tabular-nums"
+                                                >
+                                                    {{
+                                                        formatSessionTime(
+                                                            session.starts_at,
+                                                        )
+                                                    }}
+                                                    <span
+                                                        class="text-muted-foreground"
+                                                    >
+                                                        →
+                                                        {{
+                                                            formatSessionTime(
+                                                                session.ends_at,
+                                                            )
+                                                        }}
+                                                    </span>
+                                                </p>
+                                                <p
+                                                    class="flex items-center gap-1.5 text-sm text-muted-foreground"
+                                                >
+                                                    <MapPin
+                                                        class="size-3.5 shrink-0"
+                                                    />
+                                                    {{ session.room_name }}
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </section>
                 </CardContent>
             </Card>

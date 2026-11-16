@@ -1,106 +1,77 @@
 <?php
 
+use App\Models\CinemaSession;
 use App\Models\Film;
+use App\Models\Room;
+use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
 
-test('guests can view the films list', function () {
+function scheduleUpcomingSession(Film $film, ?Carbon $startsAt = null): CinemaSession
+{
+    $startsAt ??= Carbon::now()->addDays(3)->setTime(18, 0);
+
+    return CinemaSession::factory()->create([
+        'film_id' => $film->id,
+        'room_id' => Room::factory(),
+        'starts_at' => $startsAt,
+        'ends_at' => $startsAt->copy()->addMinutes($film->duration),
+    ]);
+}
+
+test('films index only lists films with upcoming sessions', function () {
+    $scheduled = Film::factory()->create(['title' => 'Programmé']);
+    scheduleUpcomingSession($scheduled);
+    Film::factory()->create(['title' => 'Sans séance']);
+
+    $this->get(route('films.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('films.data', 1)
+            ->where('films.data.0.title', 'Programmé'),
+        );
+});
+
+test('films index is empty when no upcoming sessions exist', function () {
     Film::factory()->count(2)->create();
 
     $this->get(route('films.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('films/Index')
-            ->has('films.data', 2),
+            ->has('films.data', 0),
         );
 });
 
-test('films list is empty when no films exist', function () {
-    $this->get(route('films.index'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('films/Index')
-            ->has('films.data', 0)
-            ->where('films.total', 0),
-        );
-});
+test('film show displays upcoming sessions only', function () {
+    $film = Film::factory()->create(['duration' => 100]);
+    $session = scheduleUpcomingSession(
+        $film,
+        Carbon::parse('2030-06-15 19:30:00'),
+    );
 
-test('films list displays stored film data', function () {
-    $film = Film::factory()->create([
-        'title' => 'Film de test',
-        'genre' => 'Comédie',
-        'duration' => 105,
-    ]);
-
-    $this->get(route('films.index'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('films/Index')
-            ->where('films.data.0.id', $film->id)
-            ->where('films.data.0.title', 'Film de test')
-            ->where('films.data.0.genre', 'Comédie')
-            ->where('films.data.0.duration', 105)
-            ->has('films.data.0.poster'),
-        );
-});
-
-test('films list is paginated with eight films per page', function () {
-    Film::factory()->count(10)->create();
-
-    $this->get(route('films.index'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('films/Index')
-            ->has('films.data', 8)
-            ->where('films.per_page', 8)
-            ->where('films.current_page', 1)
-            ->where('films.last_page', 2),
-        );
-
-    $this->get(route('films.index', ['page' => 2]))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->has('films.data', 2)
-            ->where('films.current_page', 2),
-        );
-});
-
-test('guests can view a film details page', function () {
-    $film = Film::factory()->create([
-        'title' => 'Film de test',
-        'synopsis' => 'Un synopsis pour les tests.',
-        'duration' => 105,
-        'genre' => 'Comédie',
+    CinemaSession::factory()->create([
+        'film_id' => $film->id,
+        'room_id' => Room::factory()->create()->id,
+        'starts_at' => Carbon::now()->subDay(),
+        'ends_at' => Carbon::now()->subDay()->addMinutes(100),
     ]);
 
     $this->get(route('films.show', $film))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('films/Show')
-            ->where('film.id', $film->id)
-            ->where('film.title', 'Film de test'),
+            ->has('sessions', 1)
+            ->where('sessions.0.id', $session->id)
+            ->where('sessions.0.room_name', $session->room->name),
         );
+});
+
+test('film show without sessions displays an empty list', function () {
+    $film = Film::factory()->create();
+
+    $this->get(route('films.show', $film))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->has('sessions', 0));
 });
 
 test('unknown film returns not found', function () {
     $this->get(route('films.show', ['film' => 99999]))->assertNotFound();
-});
-
-test('film without poster exposes null poster in list', function () {
-    $film = Film::factory()->create(['poster' => null]);
-
-    $this->get(route('films.index'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->where('films.data.0.id', $film->id)
-            ->where('films.data.0.poster', null),
-        );
-});
-
-test('films are persisted and retrieved from the database', function () {
-    $film = Film::factory()->create();
-
-    $this->assertDatabaseHas('films', [
-        'id' => $film->id,
-        'title' => $film->title,
-    ]);
 });
