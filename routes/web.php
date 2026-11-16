@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\FilmController as AdminFilmController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservationController;
@@ -17,7 +18,7 @@ Route::get('films', [FilmController::class, 'index'])->name('films.index');
 Route::get('films/{film}', [FilmController::class, 'show'])->name('films.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('reservations/create/{cinemaSession}', [ReservationController::class, 'create'])
         ->name('reservations.create');
