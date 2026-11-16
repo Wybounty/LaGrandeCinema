@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            AdminUserSeeder::class,
             FilmSeeder::class,
             RoomSeeder::class,
             CinemaSessionSeeder::class,

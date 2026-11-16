@@ -54,6 +54,13 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function superAdministrateur(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'super_administrateur',
+        ]);
+    }
+
     /**
      * Indicate that the model has two-factor authentication configured.
      */

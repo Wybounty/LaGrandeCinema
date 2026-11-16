@@ -50,9 +50,24 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         ];
     }
 
+    public function canManageUsers(): bool
+    {
+        return in_array($this->role, ['administrateur', 'super_administrateur'], true);
+    }
+
     public function isSpectateur(): bool
     {
         return $this->role === 'spectateur';
+    }
+
+    public function isAdministrateur(): bool
+    {
+        return $this->role === 'administrateur';
+    }
+
+    public function isSuperAdministrateur(): bool
+    {
+        return $this->role === 'super_administrateur';
     }
 
     /**

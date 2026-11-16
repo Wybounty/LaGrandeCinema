@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserCanManageUsers;
 use App\Http\Middleware\EnsureUserIsSpectateur;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'spectateur' => EnsureUserIsSpectateur::class,
+            'manage-users' => EnsureUserCanManageUsers::class,
         ]);
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
