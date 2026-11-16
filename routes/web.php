@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservationController;
@@ -24,6 +25,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('reservations.pay');
     Route::get('reservations/{reservation}/confirmation', [ReservationController::class, 'confirmation'])
         ->name('reservations.confirmation');
+
+    Route::middleware('manage-users')->prefix('dashboard/users')->name('users.')->group(function () {
+        Route::get('/', [AdminUserController::class, 'index'])->name('index');
+        Route::get('/create', [AdminUserController::class, 'create'])->name('create');
+        Route::post('/', [AdminUserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
+        Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
+    });
 
     Route::middleware('spectateur')->group(function () {
         Route::get('mes-billets', [TicketController::class, 'index'])->name('tickets.index');

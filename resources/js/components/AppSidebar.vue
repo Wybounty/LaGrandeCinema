@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Ticket } from '@lucide/vue';
+import { BookOpen, FolderGit2, LayoutGrid, Ticket, Users } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -17,9 +17,10 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as ticketsIndex } from '@/routes/tickets';
+import { index as usersIndex } from '@/routes/users';
 import type { Auth, NavItem } from '@/types';
 
-const page = usePage<{ auth: Auth }>();
+const page = usePage<{ auth: Auth; canManageUsers: boolean }>();
 
 const mainNavItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [
@@ -35,6 +36,14 @@ const mainNavItems = computed<NavItem[]>(() => {
             title: 'Mes billets',
             href: ticketsIndex.url(),
             icon: Ticket,
+        });
+    }
+
+    if (page.props.canManageUsers) {
+        items.push({
+            title: 'Utilisateurs',
+            href: usersIndex.url(),
+            icon: Users,
         });
     }
 
