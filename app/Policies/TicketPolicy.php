@@ -11,4 +11,9 @@ class TicketPolicy
     {
         return $user->id === $ticket->reservation->user_id;
     }
+
+    public function checkAtEntrance(User $user): bool
+    {
+        return $user->canManageUsers();
+    }
 }
