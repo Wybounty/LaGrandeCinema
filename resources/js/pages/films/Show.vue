@@ -17,6 +17,7 @@ import {
     formatSessionTime,
 } from '@/lib/formatDuration';
 import { handlePosterError, posterSrc } from '@/lib/posterFallback';
+import { create as reservationCreate } from '@/routes/reservations';
 import { index as filmsIndex } from '@/routes/films';
 import type { Film, FilmSession } from '@/types';
 
@@ -48,7 +49,7 @@ const sessionsByDate = computed(() => {
             as-child
             class="-ml-2 w-fit self-start text-muted-foreground"
         >
-            <Link :href="filmsIndex()">
+            <Link :href="filmsIndex.url()">
                 <ArrowLeft class="mr-2 size-4" />
                 Retour à la liste
             </Link>
@@ -143,34 +144,64 @@ const sessionsByDate = computed(() => {
                                         :key="session.id"
                                     >
                                         <Card class="py-4">
-                                            <CardContent class="space-y-2 px-4">
-                                                <p
-                                                    class="text-sm font-medium tabular-nums"
-                                                >
-                                                    {{
-                                                        formatSessionTime(
-                                                            session.starts_at,
-                                                        )
-                                                    }}
-                                                    <span
-                                                        class="text-muted-foreground"
+                                            <CardContent
+                                                class="flex flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between"
+                                            >
+                                                <div class="min-w-0 space-y-1.5">
+                                                    <p
+                                                        class="text-sm font-medium tabular-nums"
                                                     >
-                                                        →
                                                         {{
                                                             formatSessionTime(
-                                                                session.ends_at,
+                                                                session.starts_at,
                                                             )
                                                         }}
-                                                    </span>
-                                                </p>
-                                                <p
-                                                    class="flex items-center gap-1.5 text-sm text-muted-foreground"
+                                                        <span
+                                                            class="text-muted-foreground"
+                                                        >
+                                                            →
+                                                            {{
+                                                                formatSessionTime(
+                                                                    session.ends_at,
+                                                                )
+                                                            }}
+                                                        </span>
+                                                    </p>
+                                                    <p
+                                                        class="flex items-center gap-1.5 text-sm text-muted-foreground"
+                                                    >
+                                                        <MapPin
+                                                            class="size-3.5 shrink-0"
+                                                        />
+                                                        {{ session.room_name }}
+                                                    </p>
+                                                    <p
+                                                        class="text-xs text-muted-foreground"
+                                                    >
+                                                        {{
+                                                            session.remaining_seats
+                                                        }}
+                                                        place(s) disponible(s)
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    v-if="
+                                                        session.remaining_seats >
+                                                        0
+                                                    "
+                                                    as-child
+                                                    class="w-full shrink-0 sm:w-auto"
                                                 >
-                                                    <MapPin
-                                                        class="size-3.5 shrink-0"
-                                                    />
-                                                    {{ session.room_name }}
-                                                </p>
+                                                    <Link
+                                                        :href="
+                                                            reservationCreate.url(
+                                                                session.id,
+                                                            )
+                                                        "
+                                                    >
+                                                        Réserver cette séance
+                                                    </Link>
+                                                </Button>
                                             </CardContent>
                                         </Card>
                                     </li>

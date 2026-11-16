@@ -22,7 +22,7 @@ class FilmController extends Controller
     public function show(Film $film): Response
     {
         $sessions = $film->cinemaSessions()
-            ->with('room:id,name')
+            ->with('room:id,name,capacity')
             ->upcoming()
             ->orderBy('starts_at')
             ->get()
@@ -31,6 +31,7 @@ class FilmController extends Controller
                 'starts_at' => $session->starts_at->toIso8601String(),
                 'ends_at' => $session->ends_at->toIso8601String(),
                 'room_name' => $session->room->name,
+                'remaining_seats' => $session->remainingSeats(),
             ])
             ->all();
 
