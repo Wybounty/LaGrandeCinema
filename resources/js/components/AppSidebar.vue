@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Ticket, Users } from '@lucide/vue';
+import {
+    BookOpen,
+    Calendar,
+    Clapperboard,
+    DoorOpen,
+    FolderGit2,
+    LayoutGrid,
+    Ticket,
+    Users,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -17,6 +26,9 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as ticketsIndex } from '@/routes/tickets';
+import { index as adminFilmsIndex } from '@/routes/admin/films';
+import { index as adminRoomsIndex } from '@/routes/admin/rooms';
+import { index as adminSessionsIndex } from '@/routes/admin/sessions';
 import { index as usersIndex } from '@/routes/users';
 import type { Auth, NavItem } from '@/types';
 
@@ -40,11 +52,28 @@ const mainNavItems = computed<NavItem[]>(() => {
     }
 
     if (page.props.canManageUsers) {
-        items.push({
-            title: 'Utilisateurs',
-            href: usersIndex.url(),
-            icon: Users,
-        });
+        items.push(
+            {
+                title: 'Films',
+                href: adminFilmsIndex.url(),
+                icon: Clapperboard,
+            },
+            {
+                title: 'Séances',
+                href: adminSessionsIndex.url(),
+                icon: Calendar,
+            },
+            {
+                title: 'Salles',
+                href: adminRoomsIndex.url(),
+                icon: DoorOpen,
+            },
+            {
+                title: 'Utilisateurs',
+                href: usersIndex.url(),
+                icon: Users,
+            },
+        );
     }
 
     return items;

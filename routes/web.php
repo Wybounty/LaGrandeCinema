@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\CinemaSessionController as AdminCinemaSessionController;
+use App\Http\Controllers\Admin\FilmController as AdminFilmController;
+use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\HomeController;
@@ -33,6 +36,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
         Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
         Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::middleware('manage-users')->prefix('dashboard/films')->name('admin.films.')->group(function () {
+        Route::get('/', [AdminFilmController::class, 'index'])->name('index');
+        Route::get('/create', [AdminFilmController::class, 'create'])->name('create');
+        Route::post('/', [AdminFilmController::class, 'store'])->name('store');
+        Route::get('/{film}/edit', [AdminFilmController::class, 'edit'])->name('edit');
+        Route::patch('/{film}', [AdminFilmController::class, 'update'])->name('update');
+        Route::delete('/{film}', [AdminFilmController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::middleware('manage-users')->prefix('dashboard/rooms')->name('admin.rooms.')->group(function () {
+        Route::get('/', [AdminRoomController::class, 'index'])->name('index');
+        Route::get('/create', [AdminRoomController::class, 'create'])->name('create');
+        Route::post('/', [AdminRoomController::class, 'store'])->name('store');
+        Route::get('/{room}/edit', [AdminRoomController::class, 'edit'])->name('edit');
+        Route::patch('/{room}', [AdminRoomController::class, 'update'])->name('update');
+        Route::delete('/{room}', [AdminRoomController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::middleware('manage-users')->prefix('dashboard/sessions')->name('admin.sessions.')->group(function () {
+        Route::get('/', [AdminCinemaSessionController::class, 'index'])->name('index');
+        Route::get('/create', [AdminCinemaSessionController::class, 'create'])->name('create');
+        Route::post('/', [AdminCinemaSessionController::class, 'store'])->name('store');
+        Route::get('/{cinemaSession}/edit', [AdminCinemaSessionController::class, 'edit'])->name('edit');
+        Route::patch('/{cinemaSession}', [AdminCinemaSessionController::class, 'update'])->name('update');
+        Route::delete('/{cinemaSession}', [AdminCinemaSessionController::class, 'destroy'])->name('destroy');
     });
 
     Route::middleware('spectateur')->group(function () {

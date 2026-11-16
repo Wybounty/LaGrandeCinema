@@ -15,6 +15,7 @@ import {
 defineProps<{
     destroyUrl: string;
     label?: string;
+    description?: string;
 }>();
 </script>
 
@@ -29,8 +30,10 @@ defineProps<{
             <DialogHeader>
                 <DialogTitle>Confirmer la suppression</DialogTitle>
                 <DialogDescription>
-                    Cette action est irréversible. Les réservations et billets
-                    liés seront supprimés avec l'utilisateur.
+                    {{
+                        description ??
+                        'Cette action est irréversible.'
+                    }}
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter class="gap-2 sm:gap-0">
