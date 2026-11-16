@@ -84,7 +84,7 @@ defineProps<{
                         </CardContent>
                         <CardFooter class="px-4 pb-4 pt-4">
                             <Button as-child class="w-full">
-                                <Link :href="filmShow(film.id)"
+                                <Link :href="filmShow.url(film.id)"
                                     >Voir le film</Link
                                 >
                             </Button>

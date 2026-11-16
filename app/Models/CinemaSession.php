@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\ReservationStatus;
 use Database\Factories\CinemaSessionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -44,6 +46,28 @@ class CinemaSession extends Model
     public function scopeUpcoming(Builder $query): void
     {
         $query->where('starts_at', '>=', now());
+    }
+
+    /**
+     * @return HasMany<Reservation, $this>
+     */
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function confirmedReservedPlaces(): int
+    {
+        return (int) $this->reservations()
+            ->where('status', ReservationStatus::Confirmed)
+            ->sum('number_of_places');
+    }
+
+    public function remainingSeats(): int
+    {
+        $this->loadMissing('room');
+
+        return max(0, $this->room->capacity - $this->confirmedReservedPlaces());
     }
 
     /**

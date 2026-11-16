@@ -3,4 +3,5 @@ export type FilmSession = {
     starts_at: string;
     ends_at: string;
     room_name: string;
+    remaining_seats: number;
 };
