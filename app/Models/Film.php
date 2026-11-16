@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Database\Factories\FilmFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -23,4 +25,25 @@ class Film extends Model
 {
     /** @use HasFactory<FilmFactory> */
     use HasFactory;
+
+    /**
+     * @return HasMany<CinemaSession, $this>
+     */
+    public function cinemaSessions(): HasMany
+    {
+        return $this->hasMany(CinemaSession::class);
+    }
+
+    /**
+     * Films ayant au moins une séance à venir.
+     *
+     * @param  Builder<Film>  $query
+     */
+    public function scopeCurrentlyScheduled(Builder $query): void
+    {
+        $query->whereHas(
+            'cinemaSessions',
+            fn (Builder $sessionsQuery): Builder => $sessionsQuery->upcoming(),
+        );
+    }
 }

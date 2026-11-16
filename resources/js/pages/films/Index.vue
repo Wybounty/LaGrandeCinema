@@ -35,11 +35,11 @@ defineProps<{
             class="flex flex-col items-center justify-center rounded-xl border border-dashed border-sidebar-border/70 px-6 py-20 text-center dark:border-sidebar-border"
         >
             <p class="text-xl font-semibold tracking-tight">
-                Aucun film disponible
+                Aucun film à l'affiche
             </p>
             <p class="mt-3 max-w-md text-sm text-muted-foreground">
-                Notre programmation sera bientôt mise à jour. Revenez plus tard
-                pour découvrir les prochaines sorties.
+                Aucune séance future n'est programmée pour le moment. Revenez
+                bientôt pour découvrir la prochaine programmation.
             </p>
         </div>
 

@@ -22,6 +22,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $this->call(FilmSeeder::class);
+        $this->call([
+            FilmSeeder::class,
+            RoomSeeder::class,
+            CinemaSessionSeeder::class,
+        ]);
     }
 }
