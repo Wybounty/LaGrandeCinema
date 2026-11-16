@@ -35,4 +35,24 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | La Grande Cinéma — informations de l'entreprise
+    |--------------------------------------------------------------------------
+    |
+    | Coordonnées et texte affichés sur le site (pied de page, e-mails, etc.).
+    | Le tarif des billets est stocké en base (table cinema_settings).
+    |
+    */
+
+    'cinema' => [
+        'name' => 'La Grande Cinéma',
+        'tagline' => 'Votre cinéma de quartier — découvrez nos films et vivez la magie du grand écran.',
+        'email' => 'contact@lagrandecinema.fr',
+        'phone' => '01 23 45 67 89',
+        'address' => '12 rue du Spectateur',
+        'postal_code' => '75011',
+        'city' => 'Paris',
+    ],
+
 ];

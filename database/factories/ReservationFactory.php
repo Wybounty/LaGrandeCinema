@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\CinemaSession;
+use App\Models\CinemaSetting;
 use App\Models\Reservation;
 use App\Models\User;
 use App\ReservationStatus;
@@ -19,7 +20,7 @@ class ReservationFactory extends Factory
     public function definition(): array
     {
         $places = fake()->numberBetween(1, 4);
-        $unitPrice = (float) config('cinema.ticket_price');
+        $unitPrice = CinemaSetting::ticketPrice();
 
         return [
             'user_id' => User::factory(),

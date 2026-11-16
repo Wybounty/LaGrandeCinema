@@ -4,8 +4,18 @@ import { computed } from 'vue';
 import { home } from '@/routes';
 import { index as films } from '@/routes/films';
 
+type CinemaInfo = {
+    name: string;
+    tagline: string;
+    email: string;
+    phone: string;
+    address: string;
+    postal_code: string;
+    city: string;
+};
+
 const page = usePage();
-const appName = computed(() => page.props.name);
+const cinema = computed(() => page.props.cinema as CinemaInfo);
 const year = new Date().getFullYear();
 </script>
 
@@ -16,11 +26,20 @@ const year = new Date().getFullYear();
         >
             <div class="space-y-2">
                 <p class="text-sm font-semibold tracking-tight">
-                    {{ appName }}
+                    {{ cinema.name }}
                 </p>
                 <p class="max-w-sm text-sm text-muted-foreground">
-                    Votre cinéma de quartier — découvrez nos films et vivez la
-                    magie du grand écran.
+                    {{ cinema.tagline }}
+                </p>
+                <p class="text-xs text-muted-foreground">
+                    {{ cinema.address }}, {{ cinema.postal_code }}
+                    {{ cinema.city }} —
+                    <a
+                        :href="`mailto:${cinema.email}`"
+                        class="underline-offset-2 hover:underline"
+                        >{{ cinema.email }}</a
+                    >
+                    · {{ cinema.phone }}
                 </p>
             </div>
 
@@ -44,7 +63,7 @@ const year = new Date().getFullYear();
         </div>
 
         <div class="border-t border-border/60 py-4 text-center text-xs text-muted-foreground">
-            © {{ year }} {{ appName }}. Tous droits réservés.
+            © {{ year }} {{ cinema.name }}. Tous droits réservés.
         </div>
     </footer>
 </template>

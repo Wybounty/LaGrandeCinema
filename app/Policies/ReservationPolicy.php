@@ -11,9 +11,4 @@ class ReservationPolicy
     {
         return $user->id === $reservation->user_id;
     }
-
-    public function pay(User $user, Reservation $reservation): bool
-    {
-        return $user->id === $reservation->user_id;
-    }
 }

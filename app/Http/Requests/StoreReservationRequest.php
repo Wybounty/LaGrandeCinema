@@ -8,12 +8,9 @@ class StoreReservationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
-    /**
-     * @return array<string, array<int, string>>
-     */
     public function rules(): array
     {
         return [

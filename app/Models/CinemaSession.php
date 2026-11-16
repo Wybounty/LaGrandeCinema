@@ -56,18 +56,15 @@ class CinemaSession extends Model
         return $this->hasMany(Reservation::class);
     }
 
-    public function confirmedReservedPlaces(): int
-    {
-        return (int) $this->reservations()
-            ->where('status', ReservationStatus::Confirmed)
-            ->sum('number_of_places');
-    }
-
     public function remainingSeats(): int
     {
         $this->loadMissing('room');
 
-        return max(0, $this->room->capacity - $this->confirmedReservedPlaces());
+        $confirmedPlaces = (int) $this->reservations()
+            ->where('status', ReservationStatus::Confirmed)
+            ->sum('number_of_places');
+
+        return max(0, $this->room->capacity - $confirmedPlaces);
     }
 
     /**

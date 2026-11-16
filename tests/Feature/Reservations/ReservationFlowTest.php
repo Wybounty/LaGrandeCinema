@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\CinemaSession;
+use App\Models\CinemaSetting;
 use App\Models\Film;
 use App\Models\Reservation;
 use App\Models\Room;
@@ -55,7 +56,7 @@ test('guest is sent to login before the reservation form', function () {
 test('authenticated user can create a pending reservation', function () {
     $user = User::factory()->create();
     $session = makeBookableSession();
-    config(['cinema.ticket_price' => 10]);
+    CinemaSetting::query()->update(['ticket_price' => 10]);
 
     $response = $this->actingAs($user)->post(route('reservations.store'), [
         'cinema_session_id' => $session->id,
