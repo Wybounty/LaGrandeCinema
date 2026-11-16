@@ -11,13 +11,13 @@ Afin de faciliter le travail de développement et de garder un repository organi
 
 Chaque nouvelle tâche doit être développée dans une branche spécifique créée à partir de `develop`.
 
-| Type de branche | Utilisation | Exemple |
-|---|---|---|
-| `feature/` | Développement d'une nouvelle fonctionnalité | `feature/online-booking` |
-| `bugfix/` | Correction d'un bug | `bugfix/booking-error` |
-| `hotfix/` | Correction urgente en production | `hotfix/payment-error` |
-| `docs/` | Modification de la documentation | `docs/api-documentation` |
-| `test/` | Ajout ou modification de tests | `test/booking-tests` |
+| Type de branche | Utilisation                                 | Exemple                  |
+| --------------- | ------------------------------------------- | ------------------------ |
+| `feature/`      | Développement d'une nouvelle fonctionnalité | `feature/online-booking` |
+| `bugfix/`       | Correction d'un bug                         | `bugfix/booking-error`   |
+| `hotfix/`       | Correction urgente en production            | `hotfix/payment-error`   |
+| `docs/`         | Modification de la documentation            | `docs/api-documentation` |
+| `test/`         | Ajout ou modification de tests              | `test/booking-tests`     |
 
 ### Règles à respecter
 
