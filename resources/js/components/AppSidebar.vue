@@ -6,6 +6,7 @@ import {
     Clapperboard,
     ClipboardList,
     DoorOpen,
+    ScanLine,
     FolderGit2,
     LayoutGrid,
     Ticket,
@@ -31,6 +32,7 @@ import { index as adminFilmsIndex } from '@/routes/admin/films';
 import { index as adminReservationsIndex } from '@/routes/admin/reservations';
 import { index as adminRoomsIndex } from '@/routes/admin/rooms';
 import { index as adminSessionsIndex } from '@/routes/admin/sessions';
+import { index as adminTicketControlIndex } from '@/routes/admin/ticket-control';
 import { index as usersIndex } from '@/routes/users';
 import type { Auth, NavItem } from '@/types';
 
@@ -74,6 +76,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                 title: 'Réservations',
                 href: adminReservationsIndex.url(),
                 icon: ClipboardList,
+            },
+            {
+                title: 'Contrôle des billets',
+                href: adminTicketControlIndex.url(),
+                icon: ScanLine,
             },
             {
                 title: 'Utilisateurs',

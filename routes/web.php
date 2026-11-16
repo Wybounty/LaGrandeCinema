@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CinemaSessionController as AdminCinemaSessionCont
 use App\Http\Controllers\Admin\FilmController as AdminFilmController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
+use App\Http\Controllers\Admin\TicketControlController as AdminTicketControlController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FilmController;
@@ -62,6 +63,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [AdminReservationController::class, 'index'])->name('index');
         Route::get('/{reservation}', [AdminReservationController::class, 'show'])->name('show');
         Route::post('/{reservation}/cancel', [AdminReservationController::class, 'cancel'])->name('cancel');
+    });
+
+    Route::middleware('manage-users')->prefix('dashboard/ticket-control')->name('admin.ticket-control.')->group(function () {
+        Route::get('/', [AdminTicketControlController::class, 'index'])->name('index');
+        Route::post('/verify', [AdminTicketControlController::class, 'verify'])->name('verify');
+        Route::post('/mark-used', [AdminTicketControlController::class, 'markUsed'])->name('mark-used');
     });
 
     Route::middleware('manage-users')->prefix('dashboard/sessions')->name('admin.sessions.')->group(function () {
