@@ -12,7 +12,8 @@ Le bouton « Payer avec Stripe » illustre le futur parcours de paiement. **Aucu
 
 ## Configuration
 
-- `CINEMA_TICKET_PRICE` dans `.env` — tarif unitaire pour le calcul du montant (défaut : `12.50`).
+- **Entreprise** : `config/services.php` → clé `cinema` (nom, contact, adresse).
+- **Tarif billet** : table `cinema_settings` (défaut `12.50` €), modifiable en base pour une future interface d’administration.
 
 ## Tests de verrouillage (MySQL / InnoDB)
 

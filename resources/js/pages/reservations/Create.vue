@@ -37,7 +37,7 @@ const props = defineProps<{
 
 const numberOfPlaces = ref(1);
 
-const maxPlaces = computed(() => Math.min(props.remainingSeats, 10));
+const maxPlaces = computed(() => Math.min(props.remainingSeats, 20));
 
 const estimatedTotal = computed(
     () => numberOfPlaces.value * props.unitPrice,

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ConfirmReservationPaymentRequest;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\CinemaSession;
+use App\Models\CinemaSetting;
 use App\Models\Reservation;
 use App\Models\User;
 use App\ReservationStatus;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -34,19 +35,17 @@ class ReservationController extends Controller
                 ],
             ],
             'remainingSeats' => $cinemaSession->remainingSeats(),
-            'unitPrice' => (float) config('cinema.ticket_price'),
+            'unitPrice' => CinemaSetting::ticketPrice(),
         ]);
     }
 
     public function store(StoreReservationRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
-        $reservation = DB::transaction(function () use ($validated, $request): Reservation {
+        $reservation = DB::transaction(function () use ($request): Reservation {
             return $this->createPendingReservation(
                 $request->user(),
-                (int) $validated['cinema_session_id'],
-                (int) $validated['number_of_places'],
+                $request->integer('cinema_session_id'),
+                $request->integer('number_of_places'),
             );
         });
 
@@ -59,15 +58,15 @@ class ReservationController extends Controller
 
         return Inertia::render('reservations/Show', [
             'reservation' => $this->reservationPayload($reservation),
-            'unitPrice' => (float) config('cinema.ticket_price'),
+            'unitPrice' => CinemaSetting::ticketPrice(),
         ]);
     }
 
-    public function pay(
-        ConfirmReservationPaymentRequest $request,
-        Reservation $reservation,
-    ): RedirectResponse {
-        $this->authorize('pay', $reservation);
+    public function pay(Request $request, Reservation $reservation): RedirectResponse
+    {
+        $this->authorize('view', $reservation);
+
+        $request->validate(['simulate_success' => ['required', 'boolean']]);
 
         if (! $request->boolean('simulate_success')) {
             return back()->withErrors([
@@ -79,19 +78,7 @@ class ReservationController extends Controller
             return redirect()->route('reservations.confirmation', $reservation);
         }
 
-        try {
-            DB::transaction(function () use ($reservation): void {
-                $this->confirmReservationAfterSimulatedPayment($reservation);
-            });
-        } catch (ValidationException $exception) {
-            throw $exception;
-        } catch (\Throwable $exception) {
-            report($exception);
-
-            return back()->withErrors([
-                'payment' => 'Une erreur est survenue pendant la réservation. Veuillez réessayer.',
-            ]);
-        }
+        DB::transaction(fn () => $this->confirmReservation($reservation));
 
         return redirect()->route('reservations.confirmation', $reservation);
     }
@@ -114,18 +101,8 @@ class ReservationController extends Controller
         int $cinemaSessionId,
         int $numberOfPlaces,
     ): Reservation {
-        $unitPrice = (float) config('cinema.ticket_price');
-
-        $session = CinemaSession::query()
-            ->lockForUpdate()
-            ->with('room')
-            ->find($cinemaSessionId);
-
-        if ($session === null) {
-            throw ValidationException::withMessages([
-                'cinema_session_id' => 'Cette séance n\'existe plus.',
-            ]);
-        }
+        $unitPrice = CinemaSetting::ticketPrice();
+        $session = $this->lockSession($cinemaSessionId, 'cinema_session_id');
 
         if ($session->starts_at->isPast()) {
             throw ValidationException::withMessages([
@@ -134,12 +111,6 @@ class ReservationController extends Controller
         }
 
         $remaining = $session->remainingSeats();
-
-        if ($numberOfPlaces < 1) {
-            throw ValidationException::withMessages([
-                'number_of_places' => 'Le nombre de places demandé est invalide.',
-            ]);
-        }
 
         if ($numberOfPlaces > $remaining) {
             throw ValidationException::withMessages([
@@ -162,24 +133,15 @@ class ReservationController extends Controller
         ]);
     }
 
-    protected function confirmReservationAfterSimulatedPayment(Reservation $reservation): void
+    protected function confirmReservation(Reservation $reservation): void
     {
-        $session = CinemaSession::query()
-            ->lockForUpdate()
-            ->with('room')
-            ->find($reservation->cinema_session_id);
+        $session = $this->lockSession($reservation->cinema_session_id, 'payment');
 
-        if ($session === null) {
-            throw ValidationException::withMessages([
-                'payment' => 'Cette séance n\'existe plus.',
-            ]);
-        }
-
-        $lockedReservation = Reservation::query()
+        $reservation = Reservation::query()
             ->lockForUpdate()
             ->find($reservation->id);
 
-        if ($lockedReservation === null || $lockedReservation->status !== ReservationStatus::Pending) {
+        if ($reservation === null || $reservation->status !== ReservationStatus::Pending) {
             return;
         }
 
@@ -191,14 +153,30 @@ class ReservationController extends Controller
 
         $remaining = $session->remainingSeats();
 
-        if ($lockedReservation->number_of_places > $remaining) {
+        if ($reservation->number_of_places > $remaining) {
             throw ValidationException::withMessages([
                 'payment' => 'Une autre personne a réservé les dernières places entre-temps. '
                     .'Il reste '.$remaining.' place(s).',
             ]);
         }
 
-        $lockedReservation->update(['status' => ReservationStatus::Confirmed]);
+        $reservation->update(['status' => ReservationStatus::Confirmed]);
+    }
+
+    protected function lockSession(int $cinemaSessionId, string $errorField): CinemaSession
+    {
+        $session = CinemaSession::query()
+            ->lockForUpdate()
+            ->with('room')
+            ->find($cinemaSessionId);
+
+        if ($session === null) {
+            throw ValidationException::withMessages([
+                $errorField => 'Cette séance n\'existe plus.',
+            ]);
+        }
+
+        return $session;
     }
 
     /**
