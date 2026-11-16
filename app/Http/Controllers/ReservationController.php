@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReservationRequest;
+use App\Mail\ReservationTicketsMail;
 use App\Models\CinemaSession;
 use App\Models\CinemaSetting;
 use App\Models\Reservation;
+use App\Models\Ticket;
 use App\Models\User;
 use App\ReservationStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -78,7 +82,17 @@ class ReservationController extends Controller
             return redirect()->route('reservations.confirmation', $reservation);
         }
 
-        DB::transaction(fn () => $this->confirmReservation($reservation));
+        $confirmed = DB::transaction(fn () => $this->confirmReservation($reservation));
+
+        if ($confirmed) {
+            $reservation->refresh()->load([
+                'user',
+                'tickets',
+                'cinemaSession.film',
+                'cinemaSession.room',
+            ]);
+            Mail::to($reservation->user)->send(new ReservationTicketsMail($reservation));
+        }
 
         return redirect()->route('reservations.confirmation', $reservation);
     }
@@ -133,7 +147,7 @@ class ReservationController extends Controller
         ]);
     }
 
-    protected function confirmReservation(Reservation $reservation): void
+    protected function confirmReservation(Reservation $reservation): bool
     {
         $session = $this->lockSession($reservation->cinema_session_id, 'payment');
 
@@ -142,7 +156,7 @@ class ReservationController extends Controller
             ->find($reservation->id);
 
         if ($reservation === null || $reservation->status !== ReservationStatus::Pending) {
-            return;
+            return false;
         }
 
         if ($session->starts_at->isPast()) {
@@ -161,6 +175,32 @@ class ReservationController extends Controller
         }
 
         $reservation->update(['status' => ReservationStatus::Confirmed]);
+
+        $this->issueTicketsForReservation($reservation);
+
+        return true;
+    }
+
+    /**
+     * Un billet par place, une seule fois par réservation.
+     */
+    protected function issueTicketsForReservation(Reservation $reservation): void
+    {
+        if ($reservation->tickets()->exists()) {
+            return;
+        }
+
+        $generatedAt = now();
+
+        for ($place = 1; $place <= $reservation->number_of_places; $place++) {
+            Ticket::query()->create([
+                'reservation_id' => $reservation->id,
+                'place_number' => $place,
+                'qr_code' => (string) Str::uuid(),
+                'status' => 'valid',
+                'generated_at' => $generatedAt,
+            ]);
+        }
     }
 
     protected function lockSession(int $cinemaSessionId, string $errorField): CinemaSession
