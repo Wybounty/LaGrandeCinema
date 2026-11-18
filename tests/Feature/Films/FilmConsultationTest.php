@@ -18,6 +18,22 @@ function scheduleUpcomingSession(Film $film, ?Carbon $startsAt = null): CinemaSe
     ]);
 }
 
+test('home displays up to eight scheduled films', function () {
+    foreach (range(1, 10) as $index) {
+        scheduleUpcomingSession(
+            Film::factory()->create(['title' => "Film {$index}"]),
+        );
+    }
+    Film::factory()->create(['title' => 'Sans séance']);
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Home')
+            ->has('films', 8),
+        );
+});
+
 test('films index only lists films with upcoming sessions', function () {
     $scheduled = Film::factory()->create(['title' => 'Programmé']);
     scheduleUpcomingSession($scheduled);
