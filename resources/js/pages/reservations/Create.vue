@@ -116,10 +116,6 @@ const estimatedTotal = computed(() => numberOfPlaces.value * props.unitPrice);
                             formatMoney(estimatedTotal)
                         }}</span>
                     </p>
-                    <p class="mt-1 text-xs text-muted-foreground">
-                        Montant recalculé côté serveur avant le récapitulatif et
-                        le paiement.
-                    </p>
                 </CardContent>
             </Card>
 

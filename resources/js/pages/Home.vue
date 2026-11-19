@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import CinemaPresentation from '@/components/site/CinemaPresentation.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -68,8 +67,6 @@ defineProps<{
         <div
             class="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pb-12 md:px-6"
         >
-            <CinemaPresentation />
-
             <section class="space-y-6" aria-labelledby="home-films-heading">
                 <div class="space-y-2">
                     <h2
