@@ -6,6 +6,7 @@ use App\Concerns\PasswordValidationRules;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreManagedUserRequest extends FormRequest
 {
@@ -16,6 +17,9 @@ class StoreManagedUserRequest extends FormRequest
         return $this->user()?->can('create', User::class) ?? false;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -26,9 +30,9 @@ class StoreManagedUserRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator): void {
+        $validator->after(function (Validator $validator): void {
             if ($this->input('role') === 'super_administrateur'
                 && ! $this->user()?->isSuperAdministrateur()) {
                 $validator->errors()->add('role', 'Seul un super administrateur peut attribuer ce rôle.');

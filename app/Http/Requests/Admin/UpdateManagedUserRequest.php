@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Validator;
 
 class UpdateManagedUserRequest extends FormRequest
 {
@@ -17,6 +18,9 @@ class UpdateManagedUserRequest extends FormRequest
             && $this->user()?->can('update', $user);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         /** @var User $managedUser */
@@ -50,9 +54,9 @@ class UpdateManagedUserRequest extends FormRequest
         return ['spectateur', 'administrateur'];
     }
 
-    public function withValidator($validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator): void {
+        $validator->after(function (Validator $validator): void {
             /** @var User $managedUser */
             $managedUser = $this->route('user');
             $newRole = $this->input('role');

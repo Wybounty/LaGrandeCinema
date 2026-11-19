@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
 enum StatisticsPeriod: string
 {
@@ -12,7 +12,7 @@ enum StatisticsPeriod: string
     case Year = 'year';
 
     /**
-     * @return array{0: Carbon, 1: Carbon}
+     * @return array{0: CarbonInterface, 1: CarbonInterface}
      */
     public function range(): array
     {

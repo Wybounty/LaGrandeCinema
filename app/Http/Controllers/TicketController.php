@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reservation;
 use App\Models\Ticket;
 use App\ReservationStatus;
 use Illuminate\Http\Request;
@@ -50,13 +51,18 @@ class TicketController extends Controller
      */
     protected function ticketPayload(Ticket $ticket): array
     {
-        $session = $ticket->reservation->cinemaSession;
+        $reservation = $ticket->reservation;
+        if (! $reservation instanceof Reservation) {
+            throw new \RuntimeException('Billet sans réservation associée.');
+        }
+
+        $session = $reservation->cinemaSession;
 
         return [
             'id' => $ticket->id,
             'qr_code' => $ticket->qr_code,
             'place_number' => $ticket->place_number,
-            'places_total' => $ticket->reservation->number_of_places,
+            'places_total' => $reservation->number_of_places,
             'generated_at' => $ticket->generated_at->toIso8601String(),
             'film_title' => $session->film->title,
             'starts_at' => $session->starts_at->toIso8601String(),

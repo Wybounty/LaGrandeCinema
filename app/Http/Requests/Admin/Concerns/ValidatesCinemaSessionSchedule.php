@@ -25,7 +25,7 @@ trait ValidatesCinemaSessionSchedule
         ]);
     }
 
-    public function withValidator($validator): void
+    public function withValidator(Validator $validator): void
     {
         $session = $this->route('cinemaSession');
         $ignoreSessionId = $session instanceof CinemaSession ? $session->id : null;

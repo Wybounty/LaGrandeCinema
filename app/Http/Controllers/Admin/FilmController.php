@@ -149,7 +149,13 @@ class FilmController extends Controller
     {
         $filename = Str::uuid()->toString().'.'.$poster->guessExtension();
 
-        return $poster->storeAs('posters', $filename, 'public');
+        $path = Storage::disk('public')->putFileAs('posters', $poster, $filename);
+
+        if ($path === false) {
+            throw new \RuntimeException('Impossible d\'enregistrer l\'affiche du film.');
+        }
+
+        return $path;
     }
 
     protected function deleteStoredPoster(?string $poster): void

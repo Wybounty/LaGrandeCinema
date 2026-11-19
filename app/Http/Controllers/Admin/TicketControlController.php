@@ -97,6 +97,14 @@ class TicketControlController extends Controller
         $ticket->loadMissing('reservation.cinemaSession.film', 'reservation.cinemaSession.room');
         $reservation = $ticket->reservation;
 
+        if ($reservation === null) {
+            return [
+                'outcome' => 'invalid',
+                'message' => 'Billet invalide. Refus d\'entrée.',
+                'ticket' => $this->ticketPayload($ticket),
+            ];
+        }
+
         if ($ticket->status === 'cancelled' || $reservation->status === ReservationStatus::Cancelled) {
             return [
                 'outcome' => 'cancelled',
@@ -143,7 +151,21 @@ class TicketControlController extends Controller
     {
         $ticket->loadMissing('reservation.cinemaSession.film', 'reservation.cinemaSession.room');
 
-        $session = $ticket->reservation->cinemaSession;
+        $reservation = $ticket->reservation;
+        if ($reservation === null) {
+            return [
+                'id' => $ticket->id,
+                'qr_code' => $ticket->qr_code,
+                'place_number' => $ticket->place_number,
+                'status' => $ticket->status,
+                'film_title' => '',
+                'session_starts_at' => null,
+                'session_ends_at' => null,
+                'room_name' => '',
+            ];
+        }
+
+        $session = $reservation->cinemaSession;
 
         return [
             'id' => $ticket->id,
@@ -151,8 +173,8 @@ class TicketControlController extends Controller
             'place_number' => $ticket->place_number,
             'status' => $ticket->status,
             'film_title' => $session->film->title,
-            'session_starts_at' => $session->starts_at?->toIso8601String(),
-            'session_ends_at' => $session->ends_at?->toIso8601String(),
+            'session_starts_at' => $session->starts_at->toIso8601String(),
+            'session_ends_at' => $session->ends_at->toIso8601String(),
             'room_name' => $session->room->name,
         ];
     }

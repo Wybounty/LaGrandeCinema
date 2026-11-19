@@ -128,6 +128,7 @@ class StatisticsController extends Controller
             ->whereBetween('cinema_sessions.starts_at', [$startsAt, $endsAt])
             ->groupBy('session_date')
             ->orderBy('session_date')
+            ->toBase()
             ->get();
 
         $byDate = $rows->keyBy('session_date');
@@ -244,7 +245,7 @@ class StatisticsController extends Controller
      */
     protected function popularFilms(CarbonInterface $startsAt, CarbonInterface $endsAt): array
     {
-        return Film::query()
+        $rows = Film::query()
             ->select([
                 'films.id',
                 'films.title',
@@ -260,14 +261,21 @@ class StatisticsController extends Controller
             ->orderByDesc('places_sum')
             ->orderByDesc('reservations_count')
             ->limit(10)
-            ->get()
-            ->map(fn (Film $film): array => [
-                'id' => $film->id,
-                'title' => $film->title,
-                'poster' => $film->poster,
-                'reservations_count' => (int) $film->reservations_count,
-                'places_sum' => (int) $film->places_sum,
-            ])
-            ->all();
+            ->toBase()
+            ->get();
+
+        $films = [];
+
+        foreach ($rows as $row) {
+            $films[] = [
+                'id' => (int) $row->id,
+                'title' => (string) $row->title,
+                'poster' => $row->poster !== null ? (string) $row->poster : null,
+                'reservations_count' => (int) $row->reservations_count,
+                'places_sum' => (int) $row->places_sum,
+            ];
+        }
+
+        return $films;
     }
 }

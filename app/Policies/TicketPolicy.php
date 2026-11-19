@@ -9,7 +9,9 @@ class TicketPolicy
 {
     public function view(User $user, Ticket $ticket): bool
     {
-        return $user->id === $ticket->reservation->user_id;
+        $reservation = $ticket->reservation;
+
+        return $reservation !== null && $user->id === $reservation->user_id;
     }
 
     public function checkAtEntrance(User $user): bool
