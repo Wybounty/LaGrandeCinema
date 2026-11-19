@@ -68,7 +68,11 @@ defineOptions({
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap gap-2">
-                                        <Button as-child size="sm" variant="outline">
+                                        <Button
+                                            as-child
+                                            size="sm"
+                                            variant="outline"
+                                        >
                                             <Link :href="edit.url(room.id)">
                                                 Modifier
                                             </Link>

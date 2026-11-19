@@ -30,10 +30,7 @@ defineProps<{
             <DialogHeader>
                 <DialogTitle>Confirmer la suppression</DialogTitle>
                 <DialogDescription>
-                    {{
-                        description ??
-                        'Cette action est irréversible.'
-                    }}
+                    {{ description ?? 'Cette action est irréversible.' }}
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter class="gap-2 sm:gap-0">

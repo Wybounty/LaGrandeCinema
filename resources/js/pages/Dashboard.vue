@@ -89,23 +89,26 @@ defineOptions({
 
         <AdminStatisticsPanel v-if="statistics" v-bind="statistics" />
 
-        <div
-            v-if="isSpectateur"
-            class="grid max-w-3xl gap-4 md:grid-cols-2"
-        >
+        <div v-if="isSpectateur" class="grid max-w-3xl gap-4 md:grid-cols-2">
             <Card class="border-sidebar-border/70 dark:border-sidebar-border">
                 <CardHeader>
-                    <CardTitle class="text-lg">Votre parcours en ligne</CardTitle>
+                    <CardTitle class="text-lg"
+                        >Votre parcours en ligne</CardTitle
+                    >
                     <CardDescription>
                         Fonctionnalités disponibles avec votre compte
                         spectateur.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ul class="list-inside list-disc space-y-2 text-sm text-muted-foreground">
+                    <ul
+                        class="list-inside list-disc space-y-2 text-sm text-muted-foreground"
+                    >
                         <li>Consulter la programmation et les horaires.</li>
                         <li>Réserver et payer en ligne (Stripe).</li>
-                        <li>Recevoir des billets dématérialisés avec QR code.</li>
+                        <li>
+                            Recevoir des billets dématérialisés avec QR code.
+                        </li>
                         <li>Les retrouver ici après confirmation.</li>
                     </ul>
                 </CardContent>

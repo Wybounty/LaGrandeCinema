@@ -33,7 +33,10 @@ defineOptions({
 <template>
     <Head title="Modifier la séance" />
 
-    <AdminPage title="Modifier la séance" description="Ajustez le film, la salle ou les horaires.">
+    <AdminPage
+        title="Modifier la séance"
+        description="Ajustez le film, la salle ou les horaires."
+    >
         <Card class="max-w-lg">
             <CardContent class="pt-6">
                 <Form

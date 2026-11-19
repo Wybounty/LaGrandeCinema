@@ -19,7 +19,9 @@ defineProps<{
 <template>
     <Head title="Paiement annulé" />
 
-    <div class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6"
+    >
         <Card class="border-amber-500/40 bg-amber-500/5">
             <CardHeader>
                 <CardTitle>Paiement non finalisé</CardTitle>

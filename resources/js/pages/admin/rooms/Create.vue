@@ -20,7 +20,10 @@ defineOptions({
 <template>
     <Head title="Ajouter une salle" />
 
-    <AdminPage title="Ajouter une salle" description="Définissez le nom et la capacité.">
+    <AdminPage
+        title="Ajouter une salle"
+        description="Définissez le nom et la capacité."
+    >
         <Card class="max-w-md">
             <CardContent class="pt-6">
                 <Form

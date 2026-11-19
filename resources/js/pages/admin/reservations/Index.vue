@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { formatMoney } from '@/lib/formatMoney';
 import { reservationStatusLabel } from '@/lib/reservationStatus';
 import { cn } from '@/lib/utils';
@@ -107,7 +104,7 @@ defineOptions({
                             v-model="status"
                             :class="
                                 cn(
-                                    'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                                    'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                                 )
                             "
                             @change="applyFilters"
@@ -119,7 +116,9 @@ defineOptions({
                         </select>
                     </div>
                     <div class="grid gap-2">
-                        <Label for="reservation-date">Date de réservation</Label>
+                        <Label for="reservation-date"
+                            >Date de réservation</Label
+                        >
                         <Input
                             id="reservation-date"
                             v-model="reservationDate"
@@ -134,14 +133,18 @@ defineOptions({
                         <thead class="bg-muted/50 text-left">
                             <tr>
                                 <th class="px-3 py-3 font-medium">Réf.</th>
-                                <th class="px-3 py-3 font-medium">Spectateur</th>
+                                <th class="px-3 py-3 font-medium">
+                                    Spectateur
+                                </th>
                                 <th class="px-3 py-3 font-medium">Film</th>
                                 <th class="px-3 py-3 font-medium">Séance</th>
                                 <th class="px-3 py-3 font-medium">Salle</th>
                                 <th class="px-3 py-3 font-medium">Places</th>
                                 <th class="px-3 py-3 font-medium">Montant</th>
                                 <th class="px-3 py-3 font-medium">Statut</th>
-                                <th class="px-3 py-3 font-medium">Réservé le</th>
+                                <th class="px-3 py-3 font-medium">
+                                    Réservé le
+                                </th>
                                 <th class="px-3 py-3 font-medium">Actions</th>
                             </tr>
                         </thead>
@@ -158,17 +161,17 @@ defineOptions({
                                     <div class="font-medium">
                                         {{ row.spectator_name }}
                                     </div>
-                                    <div
-                                        class="text-muted-foreground text-xs"
-                                    >
+                                    <div class="text-xs text-muted-foreground">
                                         {{ row.spectator_email }}
                                     </div>
                                 </td>
                                 <td class="px-3 py-3">{{ row.film_title }}</td>
                                 <td class="px-3 py-3 whitespace-nowrap">
-                                    {{ formatSessionDate(row.session_starts_at) }}
+                                    {{
+                                        formatSessionDate(row.session_starts_at)
+                                    }}
                                     <br />
-                                    <span class="text-muted-foreground text-xs">
+                                    <span class="text-xs text-muted-foreground">
                                         {{
                                             formatSessionTime(
                                                 row.session_starts_at,
@@ -196,7 +199,11 @@ defineOptions({
                                     }}
                                 </td>
                                 <td class="px-3 py-3">
-                                    <Button as-child size="sm" variant="outline">
+                                    <Button
+                                        as-child
+                                        size="sm"
+                                        variant="outline"
+                                    >
                                         <Link :href="show.url(row.id)">
                                             Détail
                                         </Link>
@@ -220,10 +227,7 @@ defineOptions({
                     class="flex flex-wrap gap-1"
                     aria-label="Pagination"
                 >
-                    <template
-                        v-for="(link, i) in reservations.links"
-                        :key="i"
-                    >
+                    <template v-for="(link, i) in reservations.links" :key="i">
                         <Button
                             v-if="link.url"
                             as-child

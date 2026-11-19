@@ -44,7 +44,10 @@ const linkClass = (href: NonNullable<InertiaLinkProps['href']>) =>
                 <AppLogo />
             </Link>
 
-            <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
+            <nav
+                class="hidden items-center gap-1 md:flex"
+                aria-label="Principal"
+            >
                 <Link
                     v-for="item in navItems"
                     :key="item.title"

@@ -28,7 +28,7 @@ onMounted(() => {
     }
 
     pollTimer = setInterval(() => {
-        router.reload({ preserveScroll: true });
+        router.reload();
     }, 2500);
 });
 
@@ -42,7 +42,9 @@ onUnmounted(() => {
 <template>
     <Head title="Paiement en cours de traitement" />
 
-    <div class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6"
+    >
         <Card class="border-emerald-500/40 bg-emerald-500/5">
             <CardHeader>
                 <CardTitle>Paiement reçu par Stripe</CardTitle>
@@ -58,7 +60,9 @@ onUnmounted(() => {
                     Cette page se met à jour automatiquement…
                 </p>
                 <Button as-child variant="ghost" class="w-full">
-                    <Link :href="show(reservation.id)">Retour au récapitulatif</Link>
+                    <Link :href="show(reservation.id)"
+                        >Retour au récapitulatif</Link
+                    >
                 </Button>
             </CardContent>
         </Card>

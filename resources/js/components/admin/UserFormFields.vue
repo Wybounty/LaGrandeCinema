@@ -65,7 +65,9 @@ const roleOptions = selectableRoles(props.canAssignSuperRole);
         </div>
 
         <div class="grid gap-2">
-            <Label for="password_confirmation">Confirmation du mot de passe</Label>
+            <Label for="password_confirmation"
+                >Confirmation du mot de passe</Label
+            >
             <PasswordInput
                 id="password_confirmation"
                 name="password_confirmation"
@@ -83,8 +85,8 @@ const roleOptions = selectableRoles(props.canAssignSuperRole);
                 required
                 :class="
                     cn(
-                        'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
-                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none',
+                        'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
+                        'outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
                         disableRole && 'cursor-not-allowed opacity-50',
                     )
                 "
@@ -93,7 +95,9 @@ const roleOptions = selectableRoles(props.canAssignSuperRole);
                     v-for="option in roleOptions"
                     :key="option.value"
                     :value="option.value"
-                    :selected="(defaults?.role ?? 'spectateur') === option.value"
+                    :selected="
+                        (defaults?.role ?? 'spectateur') === option.value
+                    "
                 >
                     {{ option.label }}
                 </option>

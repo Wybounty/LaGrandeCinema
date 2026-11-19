@@ -79,9 +79,7 @@ defineOptions({
                         <div class="flex justify-between gap-4">
                             <dt class="text-muted-foreground">Statut</dt>
                             <dd>
-                                {{
-                                    reservationStatusLabel(reservation.status)
-                                }}
+                                {{ reservationStatusLabel(reservation.status) }}
                             </dd>
                         </div>
                         <div class="flex justify-between gap-4">
@@ -121,9 +119,7 @@ defineOptions({
                         {{ formatSessionDate(reservation.session.starts_at) }}
                     </p>
                     <p class="text-muted-foreground">
-                        {{
-                            formatSessionTime(reservation.session.starts_at)
-                        }}
+                        {{ formatSessionTime(reservation.session.starts_at) }}
                         →
                         {{ formatSessionTime(reservation.session.ends_at) }}
                     </p>

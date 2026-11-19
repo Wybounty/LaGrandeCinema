@@ -2,16 +2,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { CheckCircle2 } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { formatMoney } from '@/lib/formatMoney';
 import { index as filmsIndex } from '@/routes/films';
 import { index as ticketsIndex } from '@/routes/tickets';
@@ -25,10 +17,15 @@ defineProps<{
 <template>
     <Head title="Réservation confirmée" />
 
-    <div class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6"
+    >
         <Card class="text-center">
             <CardHeader class="items-center space-y-3">
-                <CheckCircle2 class="size-12 text-green-600" aria-hidden="true" />
+                <CheckCircle2
+                    class="size-12 text-green-600"
+                    aria-hidden="true"
+                />
                 <CardTitle class="text-2xl">Réservation confirmée</CardTitle>
             </CardHeader>
             <CardContent class="space-y-3 text-sm text-muted-foreground">

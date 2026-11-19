@@ -39,8 +39,8 @@ defineProps<{
                 name="synopsis"
                 rows="5"
                 required
-                class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm shadow-xs"
-            >{{ defaults?.synopsis ?? '' }}</textarea>
+                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs"
+                >{{ defaults?.synopsis ?? '' }}</textarea>
             <InputError :message="errors.synopsis" />
         </div>
 
@@ -66,7 +66,7 @@ defineProps<{
                     required
                     :class="
                         cn(
-                            'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                            'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                         )
                     "
                 >

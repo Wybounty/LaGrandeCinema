@@ -13,10 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { formatMoney } from '@/lib/formatMoney';
 import { show as filmShow } from '@/routes/films';
 import { store } from '@/routes/reservations';
@@ -39,21 +36,21 @@ const numberOfPlaces = ref(1);
 
 const maxPlaces = computed(() => Math.min(props.remainingSeats, 20));
 
-const estimatedTotal = computed(
-    () => numberOfPlaces.value * props.unitPrice,
-);
+const estimatedTotal = computed(() => numberOfPlaces.value * props.unitPrice);
 </script>
 
 <template>
     <Head :title="`Réserver — ${session.film.title}`" />
 
-    <div class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6"
+    >
         <Card>
             <CardHeader>
                 <CardTitle>Réserver des places</CardTitle>
                 <CardDescription>
-                    Choisissez le nombre de places ; le montant sera confirmé
-                    au récapitulatif avant le paiement Stripe.
+                    Choisissez le nombre de places ; le montant sera confirmé au
+                    récapitulatif avant le paiement Stripe.
                 </CardDescription>
             </CardHeader>
             <CardContent class="space-y-3 text-sm">
@@ -120,8 +117,8 @@ const estimatedTotal = computed(
                         }}</span>
                     </p>
                     <p class="mt-1 text-xs text-muted-foreground">
-                        Montant recalculé côté serveur avant le récapitulatif
-                        et le paiement.
+                        Montant recalculé côté serveur avant le récapitulatif et
+                        le paiement.
                     </p>
                 </CardContent>
             </Card>

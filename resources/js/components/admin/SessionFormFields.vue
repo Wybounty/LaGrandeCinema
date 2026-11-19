@@ -31,7 +31,7 @@ defineProps<{
                 required
                 :class="
                     cn(
-                        'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                        'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                     )
                 "
             >
@@ -56,7 +56,7 @@ defineProps<{
                 required
                 :class="
                     cn(
-                        'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                        'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                     )
                 "
             >
@@ -109,7 +109,7 @@ defineProps<{
                 <InputError :message="errors.end_time" />
             </div>
         </div>
-        <p class="text-muted-foreground text-sm">
+        <p class="text-sm text-muted-foreground">
             L'heure de fin doit correspondre à la durée du film choisi.
         </p>
     </div>

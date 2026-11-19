@@ -62,10 +62,10 @@ import {
                 <CardContent class="space-y-4 text-sm text-muted-foreground">
                     <p>
                         La programmation mêle films grand public, cinéma
-                        d'auteur, événements culturels et projections
-                        spéciales. Le cinéma accueille les habitants, les
-                        touristes, les professionnels et les publics des
-                        manifestations culturelles.
+                        d'auteur, événements culturels et projections spéciales.
+                        Le cinéma accueille les habitants, les touristes, les
+                        professionnels et les publics des manifestations
+                        culturelles.
                     </p>
                 </CardContent>
             </Card>
@@ -82,17 +82,17 @@ import {
                 </CardHeader>
                 <CardContent class="space-y-4 text-sm text-muted-foreground">
                     <p>
-                        Jusqu'à présent, les réservations passaient
-                        uniquement par le guichet, avec des files d'attente
-                        importantes, parfois plus de trente minutes, et des
-                        spectateurs qui renonçaient à leur séance.
+                        Jusqu'à présent, les réservations passaient uniquement
+                        par le guichet, avec des files d'attente importantes,
+                        parfois plus de trente minutes, et des spectateurs qui
+                        renonçaient à leur séance.
                     </p>
                     <p>
-                        L'objectif du projet est d'accroître la fréquentation
-                        de 30&nbsp;% sur douze mois, tout en réduisant
-                        l'attente, en améliorant le parcours client, en
-                        optimisant le remplissage des salles et en facilitant
-                        l'accès aux voyageurs habitués aux services numériques.
+                        L'objectif du projet est d'accroître la fréquentation de
+                        30&nbsp;% sur douze mois, tout en réduisant l'attente,
+                        en améliorant le parcours client, en optimisant le
+                        remplissage des salles et en facilitant l'accès aux
+                        voyageurs habitués aux services numériques.
                     </p>
                 </CardContent>
             </Card>
@@ -116,8 +116,8 @@ import {
                 </p>
                 <p>
                     Cette plateforme est conçue pour absorber ces pics
-                    d'affluence et offrir un parcours de réservation fluide,
-                    y compris pendant les événements à forte affluence.
+                    d'affluence et offrir un parcours de réservation fluide, y
+                    compris pendant les événements à forte affluence.
                 </p>
             </CardContent>
         </Card>
@@ -134,10 +134,7 @@ import {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <ul
-                    class="grid gap-4 text-sm sm:grid-cols-3"
-                    role="list"
-                >
+                <ul class="grid gap-4 text-sm sm:grid-cols-3" role="list">
                     <li class="rounded-lg border border-border p-4">
                         <p class="font-medium">En semaine</p>
                         <p class="mt-1 text-muted-foreground">
@@ -153,8 +150,8 @@ import {
                     <li class="rounded-lg border border-border p-4">
                         <p class="font-medium">Festival de Jazz</p>
                         <p class="mt-1 text-muted-foreground">
-                            Hausse de fréquentation et réservations groupées
-                            sur des créneaux précis.
+                            Hausse de fréquentation et réservations groupées sur
+                            des créneaux précis.
                         </p>
                     </li>
                 </ul>
@@ -201,8 +198,7 @@ import {
                 <CardHeader>
                     <CardTitle class="text-lg">Pour l'administration</CardTitle>
                     <CardDescription>
-                        Outils de gestion accessibles depuis le tableau de
-                        bord.
+                        Outils de gestion accessibles depuis le tableau de bord.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

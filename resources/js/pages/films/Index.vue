@@ -24,7 +24,9 @@ defineProps<{
 <template>
     <Head title="Films à l'affiche" />
 
-    <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-6 md:px-6"
+    >
         <Heading
             title="À l'affiche"
             description="Films grand public, cinéma d'auteur et événements : consultez les séances et les places encore disponibles avant de réserver en ligne."
@@ -82,7 +84,7 @@ defineProps<{
                                 {{ film.synopsis }}
                             </CardDescription>
                         </CardContent>
-                        <CardFooter class="px-4 pb-4 pt-4">
+                        <CardFooter class="px-4 pt-4 pb-4">
                             <Button as-child class="w-full">
                                 <Link :href="filmShow.url(film.id)"
                                     >Voir le film</Link

@@ -21,9 +21,7 @@ const year = new Date().getFullYear();
 const hasContact = computed(() => {
     const c = cinema.value;
 
-    return Boolean(
-        c.email || c.phone || (c.address && c.city),
-    );
+    return Boolean(c.email || c.phone || (c.address && c.city));
 });
 </script>
 
@@ -43,10 +41,7 @@ const hasContact = computed(() => {
                     Plus de 50 ans d'histoire · 10 salles · 1 700 places ·
                     réservation en ligne
                 </p>
-                <p
-                    v-if="hasContact"
-                    class="text-xs text-muted-foreground"
-                >
+                <p v-if="hasContact" class="text-xs text-muted-foreground">
                     <template v-if="cinema.address && cinema.city">
                         {{ cinema.address }},
                         <template v-if="cinema.postal_code">

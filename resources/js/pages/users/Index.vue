@@ -42,9 +42,7 @@ const applyFilters = useDebounceFn(() => {
 
 defineOptions({
     layout: {
-        breadcrumbs: [
-            { title: 'Utilisateurs', href: index.url() },
-        ],
+        breadcrumbs: [{ title: 'Utilisateurs', href: index.url() }],
     },
 });
 </script>
@@ -82,13 +80,15 @@ defineOptions({
                             @change="applyFilters"
                             :class="
                                 cn(
-                                    'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                                    'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                                 )
                             "
                         >
                             <option value="">Tous les rôles</option>
                             <option value="spectateur">Spectateur</option>
-                            <option value="administrateur">Administrateur</option>
+                            <option value="administrateur">
+                                Administrateur
+                            </option>
                             <option
                                 v-if="canAssignSuperRole"
                                 value="super_administrateur"
@@ -123,9 +123,9 @@ defineOptions({
                                 </td>
                                 <td class="px-4 py-3">
                                     {{
-                                        new Date(user.created_at).toLocaleString(
-                                            'fr-FR',
-                                        )
+                                        new Date(
+                                            user.created_at,
+                                        ).toLocaleString('fr-FR')
                                     }}
                                 </td>
                                 <td class="px-4 py-3">

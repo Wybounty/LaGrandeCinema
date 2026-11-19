@@ -80,7 +80,7 @@ function formatShortDate(date: string): string {
         >
             <div>
                 <h2 class="text-lg font-semibold">Statistiques</h2>
-                <p class="text-muted-foreground text-sm">
+                <p class="text-sm text-muted-foreground">
                     {{ periodLabel }}
                 </p>
             </div>
@@ -88,13 +88,11 @@ function formatShortDate(date: string): string {
                 :value="period"
                 :class="
                     cn(
-                        'border-input bg-background h-9 rounded-md border px-3 py-1 text-sm shadow-xs',
+                        'h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                     )
                 "
                 @change="
-                    changePeriod(
-                        ($event.target as HTMLSelectElement).value,
-                    )
+                    changePeriod(($event.target as HTMLSelectElement).value)
                 "
             >
                 <option
@@ -118,7 +116,7 @@ function formatShortDate(date: string): string {
                     <p class="text-2xl font-semibold">
                         {{ summary.reservations_total }}
                     </p>
-                    <p class="text-muted-foreground text-xs">
+                    <p class="text-xs text-muted-foreground">
                         {{ summary.reservations_confirmed }} confirmées ·
                         {{ summary.reservations_cancelled }} annulées
                     </p>
@@ -143,7 +141,7 @@ function formatShortDate(date: string): string {
                     <CardTitle class="text-sm font-medium">Programme</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p class="text-muted-foreground text-sm">
+                    <p class="text-sm text-muted-foreground">
                         {{ summary.films_scheduled }} films ·
                         {{ summary.sessions_scheduled }} séances
                     </p>
@@ -160,7 +158,7 @@ function formatShortDate(date: string): string {
                     <p class="text-2xl font-semibold">
                         {{ formatMoney(summary.amount_confirmed) }}
                     </p>
-                    <p class="text-muted-foreground mt-1 text-xs">
+                    <p class="mt-1 text-xs text-muted-foreground">
                         Paiements Stripe confirmés sur la période.
                     </p>
                 </CardContent>
@@ -175,7 +173,7 @@ function formatShortDate(date: string): string {
                     </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
-                    <p class="text-muted-foreground text-sm">
+                    <p class="text-sm text-muted-foreground">
                         {{ attendance.totals.reservations }} réservations ·
                         {{ attendance.totals.places }} places
                     </p>
@@ -189,20 +187,20 @@ function formatShortDate(date: string): string {
                             class="flex min-w-8 flex-1 flex-col items-center gap-1"
                         >
                             <div
-                                class="bg-primary w-full max-w-10 min-h-1 rounded-t"
+                                class="min-h-1 w-full max-w-10 rounded-t bg-primary"
                                 :style="{
                                     height: `${(point.places / maxPlaces) * 100}%`,
                                 }"
                                 :title="`${point.places} place(s)`"
                             />
                             <span
-                                class="text-muted-foreground text-[10px] leading-tight"
+                                class="text-[10px] leading-tight text-muted-foreground"
                             >
                                 {{ formatShortDate(point.date) }}
                             </span>
                         </div>
                     </div>
-                    <p v-else class="text-muted-foreground text-sm">
+                    <p v-else class="text-sm text-muted-foreground">
                         Aucune fréquentation sur cette période.
                     </p>
                 </CardContent>
@@ -219,7 +217,7 @@ function formatShortDate(date: string): string {
                         <p class="text-3xl font-semibold">
                             {{ occupancy.global.rate }} %
                         </p>
-                        <p class="text-muted-foreground text-sm">
+                        <p class="text-sm text-muted-foreground">
                             {{ occupancy.global.reserved_places }} /
                             {{ occupancy.global.total_capacity }} places
                         </p>
@@ -240,7 +238,7 @@ function formatShortDate(date: string): string {
                             </span>
                         </li>
                     </ul>
-                    <p v-else class="text-muted-foreground text-sm">
+                    <p v-else class="text-sm text-muted-foreground">
                         Aucune séance passée sur cette période.
                     </p>
                 </CardContent>
@@ -292,7 +290,7 @@ function formatShortDate(date: string): string {
                         </tbody>
                     </table>
                 </div>
-                <p v-else class="text-muted-foreground text-sm">
+                <p v-else class="text-sm text-muted-foreground">
                     Aucune réservation confirmée sur cette période.
                 </p>
             </CardContent>

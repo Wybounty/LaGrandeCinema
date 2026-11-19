@@ -8,10 +8,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { index as ticketsIndex } from '@/routes/tickets';
 import type { TicketSummary } from '@/types';
 
@@ -48,7 +45,10 @@ defineOptions({
             v-if="tickets.length === 0"
             class="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border px-6 py-16 text-center"
         >
-            <Ticket class="mb-4 size-10 text-muted-foreground" aria-hidden="true" />
+            <Ticket
+                class="mb-4 size-10 text-muted-foreground"
+                aria-hidden="true"
+            />
             <p class="font-medium">Aucun billet pour le moment</p>
             <p class="mt-2 max-w-sm text-sm text-muted-foreground">
                 Après confirmation d'une réservation, vos billets apparaîtront
@@ -80,7 +80,7 @@ defineOptions({
                             Cinéma : {{ cinemaName }}
                         </p>
                         <p
-                            class="break-all font-mono text-xs text-muted-foreground"
+                            class="font-mono text-xs break-all text-muted-foreground"
                         >
                             {{ ticket.qr_code }}
                         </p>

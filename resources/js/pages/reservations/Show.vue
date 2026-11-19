@@ -10,10 +10,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { formatMoney } from '@/lib/formatMoney';
 import { checkout } from '@/routes/reservations';
 import type { ReservationSummary } from '@/types';
@@ -27,7 +24,9 @@ defineProps<{
 <template>
     <Head title="Récapitulatif" />
 
-    <div class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:px-6"
+    >
         <Card>
             <CardHeader>
                 <CardTitle>Récapitulatif</CardTitle>
@@ -52,10 +51,7 @@ defineProps<{
             </CardContent>
         </Card>
 
-        <Card
-            v-if="reservation.status === 'pending'"
-            class="border-dashed"
-        >
+        <Card v-if="reservation.status === 'pending'" class="border-dashed">
             <CardHeader>
                 <CardTitle class="text-base">Paiement</CardTitle>
                 <CardDescription>
@@ -71,11 +67,7 @@ defineProps<{
                     disable-while-processing
                 >
                     <InputError class="mb-3" :message="errors.payment" />
-                    <Button
-                        type="submit"
-                        class="w-full"
-                        :disabled="processing"
-                    >
+                    <Button type="submit" class="w-full" :disabled="processing">
                         <Spinner v-if="processing" class="mr-2" />
                         Payer avec Stripe
                     </Button>

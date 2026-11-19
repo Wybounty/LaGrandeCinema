@@ -27,10 +27,7 @@ defineOptions({
 <template>
     <Head :title="`Modifier — ${managedUser.name}`" />
 
-    <AdminPage
-        title="Modifier l'utilisateur"
-        :description="managedUser.email"
-    >
+    <AdminPage title="Modifier l'utilisateur" :description="managedUser.email">
         <Card class="max-w-lg">
             <CardContent class="pt-6">
                 <Form

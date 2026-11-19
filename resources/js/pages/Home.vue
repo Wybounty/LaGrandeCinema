@@ -57,7 +57,9 @@ defineProps<{
                 </p>
                 <div class="flex flex-wrap gap-3">
                     <Button as-child size="lg">
-                        <Link :href="filmsIndex.url()">Voir la programmation</Link>
+                        <Link :href="filmsIndex.url()"
+                            >Voir la programmation</Link
+                        >
                     </Button>
                 </div>
             </div>
@@ -104,7 +106,9 @@ defineProps<{
                             <Card
                                 class="flex h-full flex-col overflow-hidden py-0 transition-shadow hover:shadow-md"
                             >
-                                <div class="aspect-[2/3] overflow-hidden bg-muted">
+                                <div
+                                    class="aspect-[2/3] overflow-hidden bg-muted"
+                                >
                                     <img
                                         :src="posterSrc(film.poster)"
                                         :alt="`Affiche du film ${film.title}`"
@@ -116,11 +120,15 @@ defineProps<{
                                     />
                                 </div>
                                 <CardHeader class="gap-2 px-4 pb-2">
-                                    <div class="flex flex-wrap items-center gap-2">
+                                    <div
+                                        class="flex flex-wrap items-center gap-2"
+                                    >
                                         <Badge variant="secondary">{{
                                             film.genre
                                         }}</Badge>
-                                        <span class="text-xs text-muted-foreground">
+                                        <span
+                                            class="text-xs text-muted-foreground"
+                                        >
                                             {{ formatDuration(film.duration) }}
                                         </span>
                                     </div>
@@ -131,11 +139,13 @@ defineProps<{
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent class="flex-1 px-4 pb-0">
-                                    <CardDescription class="line-clamp-3 text-sm">
+                                    <CardDescription
+                                        class="line-clamp-3 text-sm"
+                                    >
                                         {{ film.synopsis }}
                                     </CardDescription>
                                 </CardContent>
-                                <CardFooter class="px-4 pb-4 pt-4">
+                                <CardFooter class="px-4 pt-4 pb-4">
                                     <Button as-child class="w-full">
                                         <Link :href="filmShow.url(film.id)"
                                             >Voir le film</Link
@@ -146,7 +156,9 @@ defineProps<{
                         </li>
                     </ul>
 
-                    <div class="flex justify-center border-t border-border pt-8">
+                    <div
+                        class="flex justify-center border-t border-border pt-8"
+                    >
                         <Button as-child size="lg" variant="outline">
                             <Link :href="filmsIndex.url()"
                                 >Voir tous les films</Link

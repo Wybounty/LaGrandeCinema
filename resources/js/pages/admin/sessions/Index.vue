@@ -8,10 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { handlePosterError, posterSrc } from '@/lib/posterFallback';
 import { cn } from '@/lib/utils';
 import { create, edit, index, destroy } from '@/routes/admin/sessions';
@@ -101,7 +98,7 @@ defineOptions({
                             v-model="filmId"
                             :class="
                                 cn(
-                                    'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                                    'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                                 )
                             "
                             @change="applyFilters"
@@ -123,7 +120,7 @@ defineOptions({
                             v-model="roomId"
                             :class="
                                 cn(
-                                    'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                                    'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                                 )
                             "
                             @change="applyFilters"
@@ -175,8 +172,12 @@ defineOptions({
                                         @error="handlePosterError"
                                     />
                                 </td>
-                                <td class="px-4 py-3">{{ session.film.title }}</td>
-                                <td class="px-4 py-3">{{ session.room.name }}</td>
+                                <td class="px-4 py-3">
+                                    {{ session.film.title }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{ session.room.name }}
+                                </td>
                                 <td class="px-4 py-3">
                                     {{ formatSessionDate(session.starts_at) }}
                                 </td>
@@ -187,14 +188,20 @@ defineOptions({
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap gap-2">
-                                        <Button as-child size="sm" variant="outline">
+                                        <Button
+                                            as-child
+                                            size="sm"
+                                            variant="outline"
+                                        >
                                             <Link :href="edit.url(session.id)">
                                                 Modifier
                                             </Link>
                                         </Button>
                                         <ConfirmDeleteButton
                                             v-if="session.can.delete"
-                                            :destroy-url="destroy.url(session.id)"
+                                            :destroy-url="
+                                                destroy.url(session.id)
+                                            "
                                             description="La séance sera définitivement supprimée."
                                         />
                                     </div>

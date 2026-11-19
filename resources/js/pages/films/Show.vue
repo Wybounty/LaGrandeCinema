@@ -4,12 +4,7 @@ import { ArrowLeft, Calendar, Clock, Clapperboard, MapPin } from '@lucide/vue';
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
     formatDuration,
@@ -43,7 +38,9 @@ const sessionsByDate = computed(() => {
 <template>
     <Head :title="props.film.title" />
 
-    <div class="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 md:px-6">
+    <div
+        class="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 md:px-6"
+    >
         <Button
             variant="ghost"
             as-child
@@ -55,7 +52,9 @@ const sessionsByDate = computed(() => {
             </Link>
         </Button>
 
-        <article class="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
+        <article
+            class="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10"
+        >
             <div
                 class="mx-auto w-full max-w-[280px] shrink-0 sm:max-w-xs lg:mx-0 lg:max-w-sm"
             >
@@ -114,8 +113,8 @@ const sessionsByDate = computed(() => {
                                 Séances disponibles
                             </h2>
                             <p class="text-sm text-muted-foreground">
-                                Les disponibilités affichées sont mises à jour en
-                                temps réel. Réservez en ligne puis réglez sur
+                                Les disponibilités affichées sont mises à jour
+                                en temps réel. Réservez en ligne puis réglez sur
                                 Stripe pour recevoir vos billets avec QR code.
                             </p>
                         </div>
@@ -124,9 +123,7 @@ const sessionsByDate = computed(() => {
                             v-if="sessions.length === 0"
                             class="rounded-lg border border-dashed border-border px-4 py-10 text-center"
                         >
-                            <p class="font-medium">
-                                Aucune séance programmée
-                            </p>
+                            <p class="font-medium">Aucune séance programmée</p>
                         </div>
 
                         <div v-else class="space-y-6">
@@ -154,7 +151,9 @@ const sessionsByDate = computed(() => {
                                             <CardContent
                                                 class="flex flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between"
                                             >
-                                                <div class="min-w-0 space-y-1.5">
+                                                <div
+                                                    class="min-w-0 space-y-1.5"
+                                                >
                                                     <p
                                                         class="text-sm font-medium tabular-nums"
                                                     >

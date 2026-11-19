@@ -1,7 +1,4 @@
-export type UserRole =
-    | 'spectateur'
-    | 'administrateur'
-    | 'super_administrateur';
+export type UserRole = 'spectateur' | 'administrateur' | 'super_administrateur';
 
 export type User = {
     id: number;

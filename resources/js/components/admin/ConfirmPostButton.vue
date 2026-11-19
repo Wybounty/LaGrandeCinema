@@ -17,18 +17,20 @@ defineProps<{
     label?: string;
     description?: string;
     submitLabel?: string;
-    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+    variant?:
+        | 'default'
+        | 'destructive'
+        | 'outline'
+        | 'secondary'
+        | 'ghost'
+        | 'link';
 }>();
 </script>
 
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button
-                type="button"
-                :variant="variant ?? 'destructive'"
-                size="sm"
-            >
+            <Button type="button" :variant="variant ?? 'destructive'" size="sm">
                 {{ label ?? 'Confirmer' }}
             </Button>
         </DialogTrigger>

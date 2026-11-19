@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    formatSessionDate,
-    formatSessionTime,
-} from '@/lib/formatDuration';
+import { formatSessionDate, formatSessionTime } from '@/lib/formatDuration';
 import { cn } from '@/lib/utils';
 import { index, markUsed, verify } from '@/routes/admin/ticket-control';
 
@@ -105,7 +102,7 @@ async function confirmEntry(): Promise<void> {
 
         lastResponse.value = response;
     } catch {
-        scanError.value = 'Impossible de confirmer l\'entrée. Réessayez.';
+        scanError.value = "Impossible de confirmer l'entrée. Réessayez.";
     } finally {
         busy.value = false;
     }
@@ -252,7 +249,8 @@ defineOptions({
                     'border-2',
                     resultTone === 'valid' &&
                         'border-emerald-500/60 bg-emerald-500/5',
-                    resultTone === 'used' && 'border-amber-500/60 bg-amber-500/5',
+                    resultTone === 'used' &&
+                        'border-amber-500/60 bg-amber-500/5',
                     resultTone === 'rejected' &&
                         'border-destructive/60 bg-destructive/5',
                 )
@@ -309,7 +307,7 @@ defineOptions({
                     </div>
                     <div>
                         <dt class="text-muted-foreground">Identifiant</dt>
-                        <dd class="break-all font-mono text-xs">
+                        <dd class="font-mono text-xs break-all">
                             {{ lastResponse.ticket.qr_code }}
                         </dd>
                     </div>

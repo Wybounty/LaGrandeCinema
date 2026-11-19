@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 class AdminUserSeeder extends Seeder
 {
     /**
-     * Compte de développement documenté (identifiants fixes pour les tests locaux).
+     * Comptes de développement documentés (identifiants fixes pour les tests locaux).
      */
     public function run(): void
     {
@@ -18,6 +18,16 @@ class AdminUserSeeder extends Seeder
                 'name' => 'Administrateur',
                 'role' => 'super_administrateur',
                 'password' => 'CinemaAdmin2026!',
+                'email_verified_at' => now(),
+            ],
+        );
+
+        User::query()->updateOrCreate(
+            ['email' => 'spectateur@legrandcinema.test'],
+            [
+                'name' => 'Jean Spectateur',
+                'role' => 'spectateur',
+                'password' => 'CinemaSpectateur2026!',
                 'email_verified_at' => now(),
             ],
         );

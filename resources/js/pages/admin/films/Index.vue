@@ -89,7 +89,7 @@ defineOptions({
                             v-model="genre"
                             :class="
                                 cn(
-                                    'border-input bg-background h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs',
+                                    'h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs',
                                 )
                             "
                             @change="applyFilters"
@@ -144,7 +144,11 @@ defineOptions({
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap gap-2">
-                                        <Button as-child size="sm" variant="outline">
+                                        <Button
+                                            as-child
+                                            size="sm"
+                                            variant="outline"
+                                        >
                                             <Link :href="edit.url(film.id)">
                                                 Modifier
                                             </Link>
