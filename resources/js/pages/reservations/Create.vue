@@ -52,7 +52,8 @@ const estimatedTotal = computed(
             <CardHeader>
                 <CardTitle>Réserver des places</CardTitle>
                 <CardDescription>
-                    Vérifiez le film et la séance sélectionnés.
+                    Choisissez le nombre de places ; le montant sera confirmé
+                    au récapitulatif avant le paiement Stripe.
                 </CardDescription>
             </CardHeader>
             <CardContent class="space-y-3 text-sm">

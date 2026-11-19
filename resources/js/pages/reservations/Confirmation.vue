@@ -34,7 +34,8 @@ defineProps<{
             <CardContent class="space-y-3 text-sm text-muted-foreground">
                 <p>
                     Votre réservation est confirmée. Vos billets avec QR code
-                    ont été générés et envoyés par e-mail.
+                    sont disponibles dans Mes billets et une copie vous a été
+                    envoyée par e-mail.
                 </p>
                 <p class="font-medium text-foreground">
                     {{ reservation.session.film_title }}
@@ -48,8 +49,7 @@ defineProps<{
                     {{ reservation.number_of_places }} place(s)
                 </p>
                 <p class="text-foreground">
-                    Total payé (simulation) :
-                    {{ formatMoney(reservation.total_amount) }}
+                    Total payé : {{ formatMoney(reservation.total_amount) }}
                 </p>
                 <div class="mt-4 flex w-full flex-col gap-2">
                     <Button as-child class="w-full">

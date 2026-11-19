@@ -2,11 +2,14 @@
 
 use App\Models\CinemaSession;
 use App\Models\Film;
+use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
+use App\PaymentStatus;
 use App\ReservationStatus;
 use Illuminate\Support\Carbon;
+use Tests\Support\StripePaymentHelpers;
 
 test('spectator dashboard has no statistics payload', function () {
     $user = User::factory()->create();
@@ -158,4 +161,60 @@ test('period filter limits reservation totals', function () {
         ->get(route('dashboard', ['period' => 'year']))
         ->assertOk()
         ->assertInertia(fn ($page) => $page->where('statistics.summary.reservations_total', 2));
+});
+
+test('statistics reflect stripe payment when reservation was created earlier in the month', function () {
+    $admin = User::factory()->administrateur()->create();
+    StripePaymentHelpers::configureTestEnvironment();
+
+    $session = StripePaymentHelpers::makeBookableSession();
+    $user = User::factory()->create();
+    $reservation = StripePaymentHelpers::createPendingReservation($user, $session, 2);
+
+    $reservation->update(['created_at' => now()->startOfMonth()]);
+
+    $this->actingAs($admin)
+        ->get(route('dashboard', ['period' => 'month']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('statistics.summary.reservations_confirmed', 0)
+            ->where('statistics.summary.amount_confirmed', 0));
+
+    StripePaymentHelpers::checkoutAndConfirmViaWebhook($user, $reservation);
+
+    $this->actingAs($admin)
+        ->get(route('dashboard', ['period' => 'month']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('statistics.summary.reservations_confirmed', 1)
+            ->where('statistics.summary.places_confirmed', 2)
+            ->where('statistics.summary.amount_confirmed', 20));
+});
+
+test('amount confirmed uses succeeded payment totals in cents', function () {
+    $admin = User::factory()->administrateur()->create();
+    $session = CinemaSession::factory()->create([
+        'starts_at' => now()->addDay(),
+        'ends_at' => now()->addDay()->addHours(2),
+    ]);
+
+    $reservation = Reservation::factory()->create([
+        'cinema_session_id' => $session->id,
+        'status' => ReservationStatus::Confirmed,
+        'total_amount' => 99.99,
+        'created_at' => now(),
+    ]);
+
+    Payment::factory()->create([
+        'reservation_id' => $reservation->id,
+        'amount' => 9999,
+        'currency' => 'cad',
+        'status' => PaymentStatus::Succeeded,
+        'paid_at' => now(),
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('dashboard', ['period' => 'month']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('statistics.summary.amount_confirmed', 99.99));
 });

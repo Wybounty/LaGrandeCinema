@@ -81,4 +81,17 @@ class Reservation extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    /**
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function amountInCents(): int
+    {
+        return (int) round((float) $this->total_amount * 100);
+    }
 }

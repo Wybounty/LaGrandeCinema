@@ -61,7 +61,7 @@ function changePeriod(value: string) {
     router.get(
         dashboard.url({ query: { period: value } }),
         {},
-        { preserveState: true, replace: true },
+        { preserveScroll: true, replace: true },
     );
 }
 
@@ -161,7 +161,7 @@ function formatShortDate(date: string): string {
                         {{ formatMoney(summary.amount_confirmed) }}
                     </p>
                     <p class="text-muted-foreground mt-1 text-xs">
-                        Paiement simulé — non encaissé.
+                        Paiements Stripe confirmés sur la période.
                     </p>
                 </CardContent>
             </Card>

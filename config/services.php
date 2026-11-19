@@ -46,13 +46,13 @@ return [
     */
 
     'cinema' => [
-        'name' => 'La Grande Cinéma',
-        'tagline' => 'Votre cinéma de quartier — découvrez nos films et vivez la magie du grand écran.',
-        'email' => 'contact@lagrandecinema.fr',
-        'phone' => '01 23 45 67 89',
-        'address' => '12 rue du Spectateur',
-        'postal_code' => '75011',
-        'city' => 'Paris',
+        'name' => 'Le Grand Cinéma',
+        'tagline' => 'Cinéma historique, programmation variée et réservation en ligne pour simplifier votre venue.',
+        'email' => env('CINEMA_CONTACT_EMAIL', ''),
+        'phone' => env('CINEMA_CONTACT_PHONE', ''),
+        'address' => env('CINEMA_ADDRESS', ''),
+        'postal_code' => env('CINEMA_POSTAL_CODE', ''),
+        'city' => env('CINEMA_CITY', ''),
     ],
 
 ];

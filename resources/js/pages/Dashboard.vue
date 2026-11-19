@@ -89,25 +89,45 @@ defineOptions({
 
         <AdminStatisticsPanel v-if="statistics" v-bind="statistics" />
 
-        <Card
+        <div
             v-if="isSpectateur"
-            class="max-w-lg border-sidebar-border/70 dark:border-sidebar-border"
+            class="grid max-w-3xl gap-4 md:grid-cols-2"
         >
-            <CardHeader>
-                <CardTitle class="flex items-center gap-2 text-lg">
-                    <Ticket class="size-5" aria-hidden="true" />
-                    Mes billets
-                </CardTitle>
-                <CardDescription>
-                    Consultez vos billets dématérialisés et leurs QR codes après
-                    confirmation de vos réservations.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Button as-child>
-                    <Link :href="ticketsIndex.url()">Voir mes billets</Link>
-                </Button>
-            </CardContent>
-        </Card>
+            <Card class="border-sidebar-border/70 dark:border-sidebar-border">
+                <CardHeader>
+                    <CardTitle class="text-lg">Votre parcours en ligne</CardTitle>
+                    <CardDescription>
+                        Fonctionnalités disponibles avec votre compte
+                        spectateur.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ul class="list-inside list-disc space-y-2 text-sm text-muted-foreground">
+                        <li>Consulter la programmation et les horaires.</li>
+                        <li>Réserver et payer en ligne (Stripe).</li>
+                        <li>Recevoir des billets dématérialisés avec QR code.</li>
+                        <li>Les retrouver ici après confirmation.</li>
+                    </ul>
+                </CardContent>
+            </Card>
+
+            <Card class="border-sidebar-border/70 dark:border-sidebar-border">
+                <CardHeader>
+                    <CardTitle class="flex items-center gap-2 text-lg">
+                        <Ticket class="size-5" aria-hidden="true" />
+                        Mes billets
+                    </CardTitle>
+                    <CardDescription>
+                        Billets émis après paiement confirmé, prêts pour le
+                        contrôle à l'entrée.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button as-child>
+                        <Link :href="ticketsIndex.url()">Voir mes billets</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
     </div>
 </template>

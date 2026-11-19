@@ -9,20 +9,9 @@ use App\Models\User;
 use App\ReservationStatus;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Support\StripePaymentHelpers;
 
-function makeBookableSession(int $capacity = 50, ?Carbon $startsAt = null): CinemaSession
-{
-    $film = Film::factory()->create(['duration' => 100]);
-    $room = Room::factory()->create(['capacity' => $capacity]);
-    $startsAt ??= Carbon::now()->addDays(5)->setTime(19, 0);
-
-    return CinemaSession::factory()->create([
-        'film_id' => $film->id,
-        'room_id' => $room->id,
-        'starts_at' => $startsAt,
-        'ends_at' => $startsAt->copy()->addMinutes(100),
-    ]);
-}
+beforeEach(fn () => StripePaymentHelpers::configureTestEnvironment());
 
 test('film show exposes a reserve link for each upcoming session', function () {
     $film = Film::factory()->create();
@@ -45,7 +34,7 @@ test('film show exposes a reserve link for each upcoming session', function () {
 });
 
 test('guest is sent to login before the reservation form', function () {
-    $session = makeBookableSession();
+    $session = StripePaymentHelpers::makeBookableSession();
 
     $response = $this->get(route('reservations.create', $session));
 
@@ -55,7 +44,7 @@ test('guest is sent to login before the reservation form', function () {
 
 test('authenticated user can create a pending reservation', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession();
+    $session = StripePaymentHelpers::makeBookableSession();
     CinemaSetting::query()->update(['ticket_price' => 10]);
 
     $response = $this->actingAs($user)->post(route('reservations.store'), [
@@ -77,7 +66,7 @@ test('authenticated user can create a pending reservation', function () {
 
 test('reservation is refused when places exceed remaining capacity', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession(capacity: 10);
+    $session = StripePaymentHelpers::makeBookableSession(capacity: 10);
 
     Reservation::factory()->create([
         'cinema_session_id' => $session->id,
@@ -94,9 +83,9 @@ test('reservation is refused when places exceed remaining capacity', function ()
         ->assertSessionHasErrors('number_of_places');
 });
 
-test('simulated payment confirms reservation', function () {
+test('stripe payment confirms reservation', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession();
+    $session = StripePaymentHelpers::makeBookableSession();
 
     $this->actingAs($user)->post(route('reservations.store'), [
         'cinema_session_id' => $session->id,
@@ -104,19 +93,18 @@ test('simulated payment confirms reservation', function () {
     ]);
 
     $reservation = Reservation::query()->firstOrFail();
+    StripePaymentHelpers::checkoutAndConfirmViaWebhook($user, $reservation);
 
     $this->actingAs($user)
-        ->post(route('reservations.pay', $reservation), [
-            'simulate_success' => true,
-        ])
-        ->assertRedirect(route('reservations.confirmation', $reservation));
+        ->get(route('reservations.confirmation', $reservation))
+        ->assertOk();
 
     expect($reservation->fresh()->status)->toBe(ReservationStatus::Confirmed);
 });
 
-test('reservation stays pending without simulated payment', function () {
+test('reservation stays pending without stripe webhook', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession();
+    $session = StripePaymentHelpers::makeBookableSession();
 
     $this->actingAs($user)->post(route('reservations.store'), [
         'cinema_session_id' => $session->id,
@@ -126,31 +114,9 @@ test('reservation stays pending without simulated payment', function () {
     expect(Reservation::query()->firstOrFail()->status)->toBe(ReservationStatus::Pending);
 });
 
-test('failed simulated payment does not confirm reservation', function () {
-    $user = User::factory()->create();
-    $session = makeBookableSession();
-
-    $this->actingAs($user)->post(route('reservations.store'), [
-        'cinema_session_id' => $session->id,
-        'number_of_places' => 1,
-    ]);
-
-    $reservation = Reservation::query()->firstOrFail();
-
-    $this->actingAs($user)
-        ->from(route('reservations.show', $reservation))
-        ->post(route('reservations.pay', $reservation), [
-            'simulate_success' => false,
-        ])
-        ->assertRedirect(route('reservations.show', $reservation))
-        ->assertSessionHasErrors('payment');
-
-    expect($reservation->fresh()->status)->toBe(ReservationStatus::Pending);
-});
-
 test('past session cannot be reserved', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession(startsAt: Carbon::now()->subDay());
+    $session = StripePaymentHelpers::makeBookableSession(startsAt: Carbon::now()->subDay());
 
     $this->actingAs($user)
         ->post(route('reservations.store'), [
@@ -173,7 +139,7 @@ test('user cannot view another users reservation', function () {
 test('only one user can confirm when five seats remain and both want four', function () {
     $firstUser = User::factory()->create();
     $secondUser = User::factory()->create();
-    $session = makeBookableSession(capacity: 5);
+    $session = StripePaymentHelpers::makeBookableSession(capacity: 5);
 
     foreach ([$firstUser, $secondUser] as $user) {
         $this->actingAs($user)->post(route('reservations.store'), [
@@ -184,13 +150,11 @@ test('only one user can confirm when five seats remain and both want four', func
 
     $reservations = Reservation::query()->orderBy('id')->get();
 
-    $this->actingAs($firstUser)
-        ->post(route('reservations.pay', $reservations[0]), ['simulate_success' => true])
-        ->assertRedirect();
+    StripePaymentHelpers::checkoutAndConfirmViaWebhook($firstUser, $reservations[0]);
 
-    $this->actingAs($secondUser)
+    test()->actingAs($secondUser)
         ->from(route('reservations.show', $reservations[1]))
-        ->post(route('reservations.pay', $reservations[1]), ['simulate_success' => true])
+        ->post(route('reservations.checkout', $reservations[1]))
         ->assertSessionHasErrors('payment');
 
     expect(Reservation::query()->where('status', ReservationStatus::Confirmed)->sum('number_of_places'))->toBe(4);
@@ -198,7 +162,7 @@ test('only one user can confirm when five seats remain and both want four', func
 
 test('failed store does not create a reservation when the room is full', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession(capacity: 2);
+    $session = StripePaymentHelpers::makeBookableSession(capacity: 2);
 
     Reservation::factory()->create([
         'cinema_session_id' => $session->id,
@@ -219,7 +183,7 @@ test('failed store does not create a reservation when the room is full', functio
 
 test('reservation create form is reachable for the selected session', function () {
     $user = User::factory()->create();
-    $session = makeBookableSession();
+    $session = StripePaymentHelpers::makeBookableSession();
 
     $this->actingAs($user)
         ->get(route('reservations.create', $session))

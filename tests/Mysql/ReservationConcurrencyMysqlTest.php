@@ -8,6 +8,7 @@ use App\Models\User;
 use App\ReservationStatus;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\StripePaymentHelpers;
 
 beforeEach(function (): void {
     if (config('database.default') !== 'mysql') {
@@ -15,6 +16,8 @@ beforeEach(function (): void {
             'Test de concurrence MySQL/InnoDB : lancer avec DB_CONNECTION=mysql (voir README).',
         );
     }
+
+    StripePaymentHelpers::configureTestEnvironment();
 });
 
 test('mysql transactions and lockForUpdate prevent overbooking on payment', function () {
@@ -46,14 +49,8 @@ test('mysql transactions and lockForUpdate prevent overbooking on payment', func
         expect($session->remainingSeats())->toBe(5);
     });
 
-    $this->actingAs($firstUser)
-        ->post(route('reservations.pay', $reservations[0]), ['simulate_success' => true])
-        ->assertRedirect();
-
-    $this->actingAs($secondUser)
-        ->from(route('reservations.show', $reservations[1]))
-        ->post(route('reservations.pay', $reservations[1]), ['simulate_success' => true])
-        ->assertSessionHasErrors('payment');
+    StripePaymentHelpers::checkoutAndConfirmViaWebhook($firstUser, $reservations[0]);
+    StripePaymentHelpers::checkoutAndConfirmViaWebhook($secondUser, $reservations[1]);
 
     expect(
         Reservation::query()

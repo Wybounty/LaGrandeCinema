@@ -16,14 +16,15 @@ defineProps<{
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'Créer un compte',
+        description:
+            'Inscrivez-vous pour réserver des places en ligne au Grand Cinéma.',
     },
 });
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Inscription" />
 
     <Form
         v-bind="store.form()"

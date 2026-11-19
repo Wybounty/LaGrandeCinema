@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CinemaSession;
 use App\Models\Film;
+use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\Room;
+use App\PaymentStatus;
 use App\ReservationStatus;
 use App\StatisticsPeriod;
 use Carbon\CarbonInterface;
@@ -35,8 +37,7 @@ class StatisticsController extends Controller
         $reservationsInPeriod = Reservation::query()
             ->whereBetween('created_at', [$startsAt, $endsAt]);
 
-        $confirmedInPeriod = (clone $reservationsInPeriod)
-            ->where('status', ReservationStatus::Confirmed);
+        $confirmedInPeriod = $this->confirmedInPeriod($startsAt, $endsAt);
 
         $summary = [
             'reservations_total' => (clone $reservationsInPeriod)->count(),
@@ -54,7 +55,7 @@ class StatisticsController extends Controller
             'sessions_scheduled' => CinemaSession::query()
                 ->whereBetween('starts_at', [$startsAt, $endsAt])
                 ->count(),
-            'amount_confirmed' => (float) (clone $confirmedInPeriod)->sum('total_amount'),
+            'amount_confirmed' => $this->amountConfirmed($startsAt, $endsAt),
         ];
 
         return [
@@ -71,6 +72,46 @@ class StatisticsController extends Controller
             'occupancy' => $this->occupancy($startsAt, $endsAt),
             'popularFilms' => $this->popularFilms($startsAt, $endsAt),
         ];
+    }
+
+    /**
+     * Réservations confirmées sur la période (création ou paiement Stripe réussi).
+     *
+     * @return Builder<Reservation>
+     */
+    protected function confirmedInPeriod(CarbonInterface $startsAt, CarbonInterface $endsAt): Builder
+    {
+        return Reservation::query()
+            ->where('status', ReservationStatus::Confirmed)
+            ->where(function (Builder $query) use ($startsAt, $endsAt): void {
+                $query
+                    ->whereBetween('created_at', [$startsAt, $endsAt])
+                    ->orWhereHas(
+                        'payments',
+                        fn (Builder $payment) => $payment
+                            ->where('status', PaymentStatus::Succeeded)
+                            ->whereBetween('paid_at', [$startsAt, $endsAt]),
+                    );
+            });
+    }
+
+    protected function amountConfirmed(CarbonInterface $startsAt, CarbonInterface $endsAt): float
+    {
+        $fromPayments = (int) Payment::query()
+            ->where('status', PaymentStatus::Succeeded)
+            ->whereBetween('paid_at', [$startsAt, $endsAt])
+            ->sum('amount');
+
+        $legacyWithoutPayment = (float) Reservation::query()
+            ->where('status', ReservationStatus::Confirmed)
+            ->whereBetween('created_at', [$startsAt, $endsAt])
+            ->whereDoesntHave(
+                'payments',
+                fn (Builder $query) => $query->where('status', PaymentStatus::Succeeded),
+            )
+            ->sum('total_amount');
+
+        return round(($fromPayments / 100) + $legacyWithoutPayment, 2);
     }
 
     /**

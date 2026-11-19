@@ -3,24 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReservationRequest;
-use App\Mail\ReservationTicketsMail;
 use App\Models\CinemaSession;
 use App\Models\CinemaSetting;
+use App\Models\Payment;
 use App\Models\Reservation;
-use App\Models\Ticket;
 use App\Models\User;
+use App\PaymentStatus;
 use App\ReservationStatus;
+use App\Support\CompletesPaidReservations;
+use App\Support\StripeCheckout;
+use App\Support\StripePaymentCompleter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class ReservationController extends Controller
 {
+    use CompletesPaidReservations;
+
+    public function __construct(
+        private StripeCheckout $stripeCheckout,
+    ) {}
+
     public function create(CinemaSession $cinemaSession): Response
     {
         abort_if($cinemaSession->starts_at->isPast(), 404);
@@ -66,43 +74,130 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function pay(Request $request, Reservation $reservation): RedirectResponse
+    public function checkout(Request $request, Reservation $reservation): RedirectResponse|HttpResponse
     {
         $this->authorize('view', $reservation);
-
-        $request->validate(['simulate_success' => ['required', 'boolean']]);
-
-        if (! $request->boolean('simulate_success')) {
-            return back()->withErrors([
-                'payment' => 'Le paiement simulé a échoué. Aucune réservation confirmée.',
-            ]);
-        }
 
         if ($reservation->status !== ReservationStatus::Pending) {
             return redirect()->route('reservations.confirmation', $reservation);
         }
 
-        $confirmed = DB::transaction(fn () => $this->confirmReservation($reservation));
+        $this->assertReservationAmountIsValid($reservation);
 
-        if ($confirmed) {
-            $reservation->refresh()->load([
-                'user',
-                'tickets',
-                'cinemaSession.film',
-                'cinemaSession.room',
+        $currency = strtolower((string) config('stripe.currency', 'cad'));
+
+        $checkoutUrl = DB::transaction(function () use ($reservation, $currency): string {
+            $reservation = Reservation::query()
+                ->lockForUpdate()
+                ->find($reservation->id);
+
+            if ($reservation === null || $reservation->status !== ReservationStatus::Pending) {
+                throw ValidationException::withMessages([
+                    'payment' => 'Cette réservation n\'est plus en attente de paiement.',
+                ]);
+            }
+
+            $session = $this->lockCinemaSession($reservation->cinema_session_id);
+
+            if ($session->starts_at->isPast()) {
+                throw ValidationException::withMessages([
+                    'payment' => 'Cette séance est passée.',
+                ]);
+            }
+
+            $remaining = $session->remainingSeats();
+
+            if ($reservation->number_of_places > $remaining) {
+                throw ValidationException::withMessages([
+                    'payment' => 'Les places ne sont plus disponibles pour cette séance.',
+                ]);
+            }
+
+            if ($reservation->payments()->where('status', PaymentStatus::Succeeded)->exists()) {
+                throw ValidationException::withMessages([
+                    'payment' => 'Cette réservation a déjà été payée.',
+                ]);
+            }
+
+            $payment = Payment::query()->create([
+                'reservation_id' => $reservation->id,
+                'amount' => $reservation->amountInCents(),
+                'currency' => $currency,
+                'status' => PaymentStatus::Pending,
             ]);
-            Mail::to($reservation->user)->send(new ReservationTicketsMail($reservation));
+
+            $stripeSession = $this->stripeCheckout->createSession($reservation, $payment);
+
+            $payment->update([
+                'stripe_checkout_session_id' => $stripeSession->id,
+            ]);
+
+            if ($stripeSession->url === null || $stripeSession->url === '') {
+                throw ValidationException::withMessages([
+                    'payment' => 'Impossible d\'ouvrir la page de paiement Stripe.',
+                ]);
+            }
+
+            return $stripeSession->url;
+        });
+
+        if ($request->header('X-Inertia')) {
+            return Inertia::location($checkoutUrl);
         }
 
-        return redirect()->route('reservations.confirmation', $reservation);
+        return redirect()->away($checkoutUrl);
     }
 
-    public function confirmation(Reservation $reservation): Response|RedirectResponse
+    public function paymentSuccess(
+        Request $request,
+        Reservation $reservation,
+        StripePaymentCompleter $paymentCompleter,
+    ): Response|RedirectResponse {
+        $this->authorize('view', $reservation);
+
+        if ($reservation->status === ReservationStatus::Pending) {
+            $sessionId = $request->string('session_id')->toString();
+
+            if ($sessionId !== '') {
+                $paymentCompleter->syncReservationFromSessionId($reservation, $sessionId);
+                $reservation->refresh();
+            }
+        }
+
+        if ($reservation->status === ReservationStatus::Confirmed) {
+            return redirect()->route('reservations.confirmation', [
+                'reservation' => $reservation,
+                'paid' => 1,
+            ]);
+        }
+
+        return Inertia::render('reservations/PaymentSuccess', [
+            'reservation' => $this->reservationPayload($reservation),
+        ]);
+    }
+
+    public function paymentCancel(Reservation $reservation): Response
+    {
+        $this->authorize('view', $reservation);
+
+        return Inertia::render('reservations/PaymentCancel', [
+            'reservation' => $this->reservationPayload($reservation),
+        ]);
+    }
+
+    public function confirmation(Request $request, Reservation $reservation): Response|RedirectResponse
     {
         $this->authorize('view', $reservation);
 
         if ($reservation->status !== ReservationStatus::Confirmed) {
             return redirect()->route('reservations.show', $reservation);
+        }
+
+        if ($request->boolean('paid')) {
+            Inertia::flash('toast', [
+                'type' => 'success',
+                'message' => 'Paiement confirmé. Vos billets vous ont été envoyés par e-mail et sont disponibles dans Mes billets.',
+            ]);
         }
 
         return Inertia::render('reservations/Confirmation', [
@@ -116,7 +211,7 @@ class ReservationController extends Controller
         int $numberOfPlaces,
     ): Reservation {
         $unitPrice = CinemaSetting::ticketPrice();
-        $session = $this->lockSession($cinemaSessionId, 'cinema_session_id');
+        $session = $this->lockCinemaSession($cinemaSessionId);
 
         if ($session->starts_at->isPast()) {
             throw ValidationException::withMessages([
@@ -147,76 +242,15 @@ class ReservationController extends Controller
         ]);
     }
 
-    protected function confirmReservation(Reservation $reservation): bool
+    protected function assertReservationAmountIsValid(Reservation $reservation): void
     {
-        $session = $this->lockSession($reservation->cinema_session_id, 'payment');
+        $expected = round($reservation->number_of_places * CinemaSetting::ticketPrice(), 2);
 
-        $reservation = Reservation::query()
-            ->lockForUpdate()
-            ->find($reservation->id);
-
-        if ($reservation === null || $reservation->status !== ReservationStatus::Pending) {
-            return false;
-        }
-
-        if ($session->starts_at->isPast()) {
+        if ((float) $reservation->total_amount !== $expected) {
             throw ValidationException::withMessages([
-                'payment' => 'Cette séance est passée.',
+                'payment' => 'Le montant de la réservation est invalide.',
             ]);
         }
-
-        $remaining = $session->remainingSeats();
-
-        if ($reservation->number_of_places > $remaining) {
-            throw ValidationException::withMessages([
-                'payment' => 'Une autre personne a réservé les dernières places entre-temps. '
-                    .'Il reste '.$remaining.' place(s).',
-            ]);
-        }
-
-        $reservation->update(['status' => ReservationStatus::Confirmed]);
-
-        $this->issueTicketsForReservation($reservation);
-
-        return true;
-    }
-
-    /**
-     * Un billet par place, une seule fois par réservation.
-     */
-    protected function issueTicketsForReservation(Reservation $reservation): void
-    {
-        if ($reservation->tickets()->exists()) {
-            return;
-        }
-
-        $generatedAt = now();
-
-        for ($place = 1; $place <= $reservation->number_of_places; $place++) {
-            Ticket::query()->create([
-                'reservation_id' => $reservation->id,
-                'place_number' => $place,
-                'qr_code' => (string) Str::uuid(),
-                'status' => 'valid',
-                'generated_at' => $generatedAt,
-            ]);
-        }
-    }
-
-    protected function lockSession(int $cinemaSessionId, string $errorField): CinemaSession
-    {
-        $session = CinemaSession::query()
-            ->lockForUpdate()
-            ->with('room')
-            ->find($cinemaSessionId);
-
-        if ($session === null) {
-            throw ValidationException::withMessages([
-                $errorField => 'Cette séance n\'existe plus.',
-            ]);
-        }
-
-        return $session;
     }
 
     /**
