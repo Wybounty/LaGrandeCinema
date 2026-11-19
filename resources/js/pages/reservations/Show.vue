@@ -15,10 +15,10 @@ import {
     formatSessionTime,
 } from '@/lib/formatDuration';
 import { formatMoney } from '@/lib/formatMoney';
-import { pay } from '@/routes/reservations';
+import { checkout } from '@/routes/reservations';
 import type { ReservationSummary } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     reservation: ReservationSummary;
     unitPrice: number;
 }>();
@@ -32,7 +32,7 @@ const props = defineProps<{
             <CardHeader>
                 <CardTitle>Récapitulatif</CardTitle>
                 <CardDescription>
-                    Vérifiez votre réservation avant le paiement simulé.
+                    Vérifiez les détails avant le paiement sécurisé sur Stripe.
                 </CardDescription>
             </CardHeader>
             <CardContent class="space-y-3 text-sm">
@@ -45,9 +45,7 @@ const props = defineProps<{
                 </p>
                 <p>{{ reservation.session.room_name }}</p>
                 <p>{{ reservation.number_of_places }} place(s)</p>
-                <p>
-                    Prix unitaire : {{ formatMoney(unitPrice) }}
-                </p>
+                <p>Prix unitaire : {{ formatMoney(unitPrice) }}</p>
                 <p class="text-lg font-semibold">
                     Total : {{ formatMoney(reservation.total_amount) }}
                 </p>
@@ -59,19 +57,19 @@ const props = defineProps<{
             class="border-dashed"
         >
             <CardHeader>
-                <CardTitle class="text-base">Paiement simulé</CardTitle>
+                <CardTitle class="text-base">Paiement</CardTitle>
                 <CardDescription>
-                    Ceci est une simulation : aucun paiement réel n'est effectué
-                    et aucune donnée bancaire n'est demandée.
+                    Vous serez redirigé vers Stripe pour régler votre
+                    réservation. La confirmation définitive intervient après
+                    validation du paiement par notre serveur.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <Form
-                    v-bind="pay.form(reservation.id)"
+                    v-bind="checkout.form(reservation.id)"
                     v-slot="{ errors, processing }"
                     disable-while-processing
                 >
-                    <input type="hidden" name="simulate_success" value="1" />
                     <InputError class="mb-3" :message="errors.payment" />
                     <Button
                         type="submit"
@@ -79,7 +77,7 @@ const props = defineProps<{
                         :disabled="processing"
                     >
                         <Spinner v-if="processing" class="mr-2" />
-                        Payer avec Stripe (simulation)
+                        Payer avec Stripe
                     </Button>
                 </Form>
             </CardContent>

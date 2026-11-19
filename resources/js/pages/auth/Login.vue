@@ -11,12 +11,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/PasskeyVerify.vue';
-
 defineOptions({
     layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
+        title: 'Connexion',
+        description:
+            'Accédez à votre espace pour réserver et retrouver vos billets.',
     },
 });
 
@@ -27,7 +26,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Connexion" />
 
     <div
         v-if="status"

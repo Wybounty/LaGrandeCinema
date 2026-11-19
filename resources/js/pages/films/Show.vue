@@ -109,9 +109,16 @@ const sessionsByDate = computed(() => {
                     <Separator />
 
                     <section class="space-y-5">
-                        <h2 class="text-lg font-semibold tracking-tight">
-                            Séances disponibles
-                        </h2>
+                        <div class="space-y-1">
+                            <h2 class="text-lg font-semibold tracking-tight">
+                                Séances disponibles
+                            </h2>
+                            <p class="text-sm text-muted-foreground">
+                                Les disponibilités affichées sont mises à jour en
+                                temps réel. Réservez en ligne puis réglez sur
+                                Stripe pour recevoir vos billets avec QR code.
+                            </p>
+                        </div>
 
                         <div
                             v-if="sessions.length === 0"

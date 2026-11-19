@@ -27,7 +27,7 @@ defineProps<{
     <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-6 md:px-6">
         <Heading
             title="À l'affiche"
-            description="Découvrez la programmation du Grand Cinéma et explorez nos films."
+            description="Films grand public, cinéma d'auteur et événements : consultez les séances et les places encore disponibles avant de réserver en ligne."
         />
 
         <div

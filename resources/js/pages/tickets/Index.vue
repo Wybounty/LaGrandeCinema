@@ -39,8 +39,8 @@ defineOptions({
         <div class="space-y-1">
             <h1 class="text-2xl font-semibold tracking-tight">Mes billets</h1>
             <p class="text-sm text-muted-foreground">
-                Retrouvez ici vos billets pour {{ cinemaName }}, avec leur QR
-                code personnel.
+                Billets dématérialisés pour {{ cinemaName }} : chaque QR code
+                est unique et sert au contrôle à l'entrée.
             </p>
         </div>
 
