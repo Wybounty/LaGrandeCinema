@@ -17,9 +17,7 @@ class AdminUsersEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 
     #[OA\Get(
         path: '/dashboard/users/create',
@@ -29,9 +27,7 @@ class AdminUsersEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function create(): void
-    {
-    }
+    public function create(): void {}
 
     #[OA\Post(
         path: '/dashboard/users',
@@ -62,9 +58,7 @@ class AdminUsersEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function store(): void
-    {
-    }
+    public function store(): void {}
 
     #[OA\Get(
         path: '/dashboard/users/{user}/edit',
@@ -75,9 +69,7 @@ class AdminUsersEndpoints
         parameters: [new OA\Parameter(name: 'user', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function edit(): void
-    {
-    }
+    public function edit(): void {}
 
     #[OA\Patch(
         path: '/dashboard/users/{user}',
@@ -106,9 +98,7 @@ class AdminUsersEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function update(): void
-    {
-    }
+    public function update(): void {}
 
     #[OA\Delete(
         path: '/dashboard/users/{user}',
@@ -120,7 +110,5 @@ class AdminUsersEndpoints
         parameters: [new OA\Parameter(name: 'user', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 302, ref: '#/components/responses/WebRedirect')],
     )]
-    public function destroy(): void
-    {
-    }
+    public function destroy(): void {}
 }

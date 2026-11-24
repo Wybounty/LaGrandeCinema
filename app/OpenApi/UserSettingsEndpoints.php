@@ -19,9 +19,7 @@ class UserSettingsEndpoints
             new OA\Response(response: 302, description: 'Redirection vers `/settings/profile`.'),
         ],
     )]
-    public function redirectToProfile(): void
-    {
-    }
+    public function redirectToProfile(): void {}
 
     #[OA\Get(
         path: '/settings/profile',
@@ -32,9 +30,7 @@ class UserSettingsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function profileEdit(): void
-    {
-    }
+    public function profileEdit(): void {}
 
     #[OA\Patch(
         path: '/settings/profile',
@@ -59,9 +55,7 @@ class UserSettingsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function profileUpdate(): void
-    {
-    }
+    public function profileUpdate(): void {}
 
     #[OA\Delete(
         path: '/settings/profile',
@@ -75,9 +69,7 @@ class UserSettingsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function profileDestroy(): void
-    {
-    }
+    public function profileDestroy(): void {}
 
     #[OA\Get(
         path: '/settings/security',
@@ -88,9 +80,7 @@ class UserSettingsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function securityEdit(): void
-    {
-    }
+    public function securityEdit(): void {}
 
     #[OA\Put(
         path: '/settings/password',
@@ -117,9 +107,7 @@ class UserSettingsEndpoints
             new OA\Response(response: 429, description: 'Trop de tentatives (throttle).'),
         ],
     )]
-    public function passwordUpdate(): void
-    {
-    }
+    public function passwordUpdate(): void {}
 
     #[OA\Get(
         path: '/settings/appearance',
@@ -130,7 +118,5 @@ class UserSettingsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function appearance(): void
-    {
-    }
+    public function appearance(): void {}
 }

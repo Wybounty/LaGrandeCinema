@@ -21,7 +21,5 @@ class AdminTicketControlInertiaEndpoint
             new OA\Response(response: 403, description: 'Policy `checkAtEntrance` refusée.'),
         ],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 }

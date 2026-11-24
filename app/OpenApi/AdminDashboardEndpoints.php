@@ -39,7 +39,5 @@ class AdminDashboardEndpoints
             new OA\Response(response: 403, description: 'Compte non vérifié (`verified`).'),
         ],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 }

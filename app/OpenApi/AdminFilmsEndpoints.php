@@ -22,9 +22,7 @@ class AdminFilmsEndpoints
             new OA\Response(response: 403, description: 'Non administrateur ou policy `viewAny` refusée.'),
         ],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 
     #[OA\Get(
         path: '/dashboard/films/create',
@@ -38,9 +36,7 @@ class AdminFilmsEndpoints
             new OA\Response(response: 403, description: 'Policy `create` refusée.'),
         ],
     )]
-    public function create(): void
-    {
-    }
+    public function create(): void {}
 
     #[OA\Post(
         path: '/dashboard/films',
@@ -72,9 +68,7 @@ class AdminFilmsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function store(): void
-    {
-    }
+    public function store(): void {}
 
     #[OA\Get(
         path: '/dashboard/films/{film}/edit',
@@ -91,9 +85,7 @@ class AdminFilmsEndpoints
             new OA\Response(response: 404, description: 'Film introuvable.'),
         ],
     )]
-    public function edit(): void
-    {
-    }
+    public function edit(): void {}
 
     #[OA\Patch(
         path: '/dashboard/films/{film}',
@@ -127,9 +119,7 @@ class AdminFilmsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function update(): void
-    {
-    }
+    public function update(): void {}
 
     #[OA\Delete(
         path: '/dashboard/films/{film}',
@@ -146,7 +136,5 @@ class AdminFilmsEndpoints
             new OA\Response(response: 403, description: 'Policy refusée.'),
         ],
     )]
-    public function destroy(): void
-    {
-    }
+    public function destroy(): void {}
 }

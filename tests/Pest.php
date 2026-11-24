@@ -61,7 +61,7 @@ function laravelEmailVerificationUrl(User $user): string
 {
     $notification = new VerifyEmail;
 
-    $method = new \ReflectionMethod(VerifyEmail::class, 'verificationUrl');
+    $method = new ReflectionMethod(VerifyEmail::class, 'verificationUrl');
     $method->setAccessible(true);
 
     return $method->invoke($notification, $user);

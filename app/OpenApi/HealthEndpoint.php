@@ -26,7 +26,5 @@ class HealthEndpoint
             new OA\Response(response: 500, description: 'Application indisponible.'),
         ],
     )]
-    public function health(): void
-    {
-    }
+    public function health(): void {}
 }

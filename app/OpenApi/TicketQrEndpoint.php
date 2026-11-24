@@ -36,7 +36,5 @@ class TicketQrEndpoint
             new OA\Response(response: 404, description: 'Billet introuvable.'),
         ],
     )]
-    public function qrCode(): void
-    {
-    }
+    public function qrCode(): void {}
 }

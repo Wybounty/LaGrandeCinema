@@ -32,9 +32,7 @@ class TicketControlEndpoints
             ),
         ],
     )]
-    public function verify(): void
-    {
-    }
+    public function verify(): void {}
 
     #[OA\Post(
         path: '/dashboard/ticket-control/mark-used',
@@ -62,7 +60,5 @@ class TicketControlEndpoints
             ),
         ],
     )]
-    public function markUsed(): void
-    {
-    }
+    public function markUsed(): void {}
 }

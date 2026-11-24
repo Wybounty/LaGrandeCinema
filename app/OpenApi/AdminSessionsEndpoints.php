@@ -19,9 +19,7 @@ class AdminSessionsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 
     #[OA\Get(
         path: '/dashboard/sessions/create',
@@ -32,9 +30,7 @@ class AdminSessionsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function create(): void
-    {
-    }
+    public function create(): void {}
 
     #[OA\Post(
         path: '/dashboard/sessions',
@@ -64,9 +60,7 @@ class AdminSessionsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function store(): void
-    {
-    }
+    public function store(): void {}
 
     #[OA\Get(
         path: '/dashboard/sessions/{cinemaSession}/edit',
@@ -79,9 +73,7 @@ class AdminSessionsEndpoints
         ],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function edit(): void
-    {
-    }
+    public function edit(): void {}
 
     #[OA\Patch(
         path: '/dashboard/sessions/{cinemaSession}',
@@ -101,9 +93,7 @@ class AdminSessionsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function update(): void
-    {
-    }
+    public function update(): void {}
 
     #[OA\Delete(
         path: '/dashboard/sessions/{cinemaSession}',
@@ -117,7 +107,5 @@ class AdminSessionsEndpoints
         ],
         responses: [new OA\Response(response: 302, ref: '#/components/responses/WebRedirect')],
     )]
-    public function destroy(): void
-    {
-    }
+    public function destroy(): void {}
 }

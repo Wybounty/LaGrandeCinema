@@ -17,9 +17,7 @@ class AdminRoomsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 
     #[OA\Get(
         path: '/dashboard/rooms/create',
@@ -29,9 +27,7 @@ class AdminRoomsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function create(): void
-    {
-    }
+    public function create(): void {}
 
     #[OA\Post(
         path: '/dashboard/rooms',
@@ -56,9 +52,7 @@ class AdminRoomsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function store(): void
-    {
-    }
+    public function store(): void {}
 
     #[OA\Get(
         path: '/dashboard/rooms/{room}/edit',
@@ -69,9 +63,7 @@ class AdminRoomsEndpoints
         parameters: [new OA\Parameter(name: 'room', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function edit(): void
-    {
-    }
+    public function edit(): void {}
 
     #[OA\Patch(
         path: '/dashboard/rooms/{room}',
@@ -90,9 +82,7 @@ class AdminRoomsEndpoints
             new OA\Response(response: 422, description: 'Erreur de validation.', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function update(): void
-    {
-    }
+    public function update(): void {}
 
     #[OA\Delete(
         path: '/dashboard/rooms/{room}',
@@ -103,7 +93,5 @@ class AdminRoomsEndpoints
         parameters: [new OA\Parameter(name: 'room', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 302, ref: '#/components/responses/WebRedirect')],
     )]
-    public function destroy(): void
-    {
-    }
+    public function destroy(): void {}
 }

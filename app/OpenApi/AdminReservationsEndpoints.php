@@ -17,9 +17,7 @@ class AdminReservationsEndpoints
         tags: [self::TAG],
         responses: [new OA\Response(response: 200, ref: '#/components/responses/InertiaPage')],
     )]
-    public function index(): void
-    {
-    }
+    public function index(): void {}
 
     #[OA\Get(
         path: '/dashboard/reservations/{reservation}',
@@ -36,9 +34,7 @@ class AdminReservationsEndpoints
             new OA\Response(response: 403, description: 'Policy `view` refusée.'),
         ],
     )]
-    public function show(): void
-    {
-    }
+    public function show(): void {}
 
     #[OA\Post(
         path: '/dashboard/reservations/{reservation}/cancel',
@@ -55,7 +51,5 @@ class AdminReservationsEndpoints
             new OA\Response(response: 403, description: 'Annulation non autorisée.'),
         ],
     )]
-    public function cancel(): void
-    {
-    }
+    public function cancel(): void {}
 }

@@ -56,6 +56,4 @@ use OpenApi\Attributes as OA;
     name: 'Stripe-Signature',
     in: 'header',
 )]
-class OpenApiSpec
-{
-}
+class OpenApiSpec {}

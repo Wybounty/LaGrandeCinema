@@ -48,7 +48,5 @@ class StripeWebhookEndpoint
             ),
         ],
     )]
-    public function webhook(): void
-    {
-    }
+    public function webhook(): void {}
 }

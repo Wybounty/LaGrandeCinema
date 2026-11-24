@@ -18,9 +18,7 @@
     "paths": {
         "/dashboard": {
             "get": {
-                "tags": [
-                    "Tableau de bord – Interface Inertia"
-                ],
+                "tags": ["Tableau de bord – Interface Inertia"],
                 "summary": "Tableau de bord et statistiques (Inertia)",
                 "description": "Tableau de bord connecté. **Contrôleur** : `DashboardController@index`.\nSi l'utilisateur peut gérer les utilisateurs (`canManageUsers`), les statistiques sont calculées par `Admin\\StatisticsController::collect()` et passées en prop Inertia `statistics`.\nSpectateurs : page sans bloc statistiques admin.",
                 "operationId": "dashboardIndex",
@@ -33,12 +31,7 @@
                         "schema": {
                             "type": "string",
                             "default": "month",
-                            "enum": [
-                                "today",
-                                "week",
-                                "month",
-                                "year"
-                            ]
+                            "enum": ["today", "week", "month", "year"]
                         }
                     }
                 ],
@@ -62,9 +55,7 @@
         },
         "/dashboard/films": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Films — liste (Inertia)",
                 "description": "`Admin\\FilmController`@index — liste paginée. **Middleware** : `auth`, `verified`, `manage-users` (`EnsureUserCanManageUsers` — rôle `administrateur` ou `super_administrateur`).\n**Autorisation** : policies Laravel sur le modèle concerné (`authorize` dans le contrôleur ou le Form Request).",
                 "operationId": "adminFilmsIndex",
@@ -86,9 +77,7 @@
                 ]
             },
             "post": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Films — créer",
                 "description": "`Admin\\FilmController`@store — validation `StoreFilmRequest` (multipart avec affiche).",
                 "operationId": "adminFilmsStore",
@@ -163,9 +152,7 @@
         },
         "/dashboard/films/create": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Films — formulaire de création (Inertia)",
                 "description": "`Admin\\FilmController`@create — formulaire de création.",
                 "operationId": "adminFilmsCreate",
@@ -186,9 +173,7 @@
         },
         "/dashboard/films/{film}/edit": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Films — formulaire d'édition (Inertia)",
                 "description": "`Admin\\FilmController`@edit",
                 "operationId": "adminFilmsEdit",
@@ -219,9 +204,7 @@
         },
         "/dashboard/films/{film}": {
             "delete": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Films — supprimer",
                 "description": "`Admin\\FilmController`@destroy — policy `delete`; impossible si des séances existent.",
                 "operationId": "adminFilmsDestroy",
@@ -253,9 +236,7 @@
                 ]
             },
             "patch": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Films — mettre à jour",
                 "description": "`Admin\\FilmController`@update — `UpdateFilmRequest`.",
                 "operationId": "adminFilmsUpdate",
@@ -331,9 +312,7 @@
         },
         "/dashboard/reservations": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Réservations — liste (Inertia)",
                 "description": "`Admin\\ReservationController@index` — policy `viewAny` sur `Reservation`.",
                 "operationId": "adminReservationsIndex",
@@ -351,9 +330,7 @@
         },
         "/dashboard/reservations/{reservation}": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Réservations — détail (Inertia)",
                 "description": "`Admin\\ReservationController@show` — détail avec places, billets, statuts.",
                 "operationId": "adminReservationsShow",
@@ -384,9 +361,7 @@
         },
         "/dashboard/reservations/{reservation}/cancel": {
             "post": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Réservations — annuler (redirection)",
                 "description": "`Admin\\ReservationController@cancel` — policy `cancel`. Pas de corps JSON ; action POST Inertia.",
                 "operationId": "adminReservationsCancel",
@@ -420,9 +395,7 @@
         },
         "/dashboard/rooms": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Salles — liste (Inertia)",
                 "description": "`Admin\\RoomController@index` — salles et capacité (`capacity` = places).",
                 "operationId": "adminRoomsIndex",
@@ -438,9 +411,7 @@
                 ]
             },
             "post": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Salles — créer",
                 "description": "`StoreRoomRequest`",
                 "operationId": "adminRoomsStore",
@@ -449,10 +420,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "name",
-                                    "capacity"
-                                ],
+                                "required": ["name", "capacity"],
                                 "properties": {
                                     "name": {
                                         "type": "string",
@@ -497,9 +465,7 @@
         },
         "/dashboard/rooms/create": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Salles — formulaire de création (Inertia)",
                 "operationId": "adminRoomsCreate",
                 "responses": {
@@ -516,9 +482,7 @@
         },
         "/dashboard/rooms/{room}/edit": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Salles — édition (Inertia)",
                 "operationId": "adminRoomsEdit",
                 "parameters": [
@@ -545,9 +509,7 @@
         },
         "/dashboard/rooms/{room}": {
             "delete": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Salles — supprimer",
                 "operationId": "adminRoomsDestroy",
                 "parameters": [
@@ -575,9 +537,7 @@
                 ]
             },
             "patch": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Salles — mettre à jour",
                 "description": "`UpdateRoomRequest`",
                 "operationId": "adminRoomsUpdate",
@@ -628,9 +588,7 @@
         },
         "/dashboard/sessions": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Séances — liste (Inertia)",
                 "description": "`Admin\\CinemaSessionController`@index",
                 "operationId": "adminSessionsIndex",
@@ -646,9 +604,7 @@
                 ]
             },
             "post": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Séances — créer",
                 "description": "`Admin\\CinemaSessionController`@store — `CinemaSessionRequest` (+ contraintes d'horaires via `ValidatesCinemaSessionSchedule`).",
                 "operationId": "adminSessionsStore",
@@ -730,9 +686,7 @@
         },
         "/dashboard/sessions/create": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Séances — formulaire de création (Inertia)",
                 "description": "`Admin\\CinemaSessionController`@create",
                 "operationId": "adminSessionsCreate",
@@ -750,9 +704,7 @@
         },
         "/dashboard/sessions/{cinemaSession}/edit": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Séances — édition (Inertia)",
                 "operationId": "adminSessionsEdit",
                 "parameters": [
@@ -779,9 +731,7 @@
         },
         "/dashboard/sessions/{cinemaSession}": {
             "delete": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Séances — supprimer",
                 "description": "`Admin\\CinemaSessionController`@destroy",
                 "operationId": "adminSessionsDestroy",
@@ -810,9 +760,7 @@
                 ]
             },
             "patch": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Séances — mettre à jour",
                 "operationId": "adminSessionsUpdate",
                 "parameters": [
@@ -862,9 +810,7 @@
         },
         "/dashboard/ticket-control": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Contrôle billets — interface (Inertia)",
                 "description": "`Admin\\\\TicketControlController@index` — écran de scan (Inertia).\nLes actions JSON de vérification sont documentées séparément (`Contrôle billets (JSON)`).",
                 "operationId": "adminTicketControlIndex",
@@ -885,9 +831,7 @@
         },
         "/dashboard/users": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Utilisateurs — liste (Inertia)",
                 "description": "`Admin\\UserController@index`",
                 "operationId": "adminUsersIndex",
@@ -903,9 +847,7 @@
                 ]
             },
             "post": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Utilisateurs — créer",
                 "description": "`StoreManagedUserRequest` — rôles selon le créateur (`spectateur`, `administrateur`, optionnel `super_administrateur`).",
                 "operationId": "adminUsersStore",
@@ -973,9 +915,7 @@
         },
         "/dashboard/users/create": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Utilisateurs — formulaire de création (Inertia)",
                 "operationId": "adminUsersCreate",
                 "responses": {
@@ -992,9 +932,7 @@
         },
         "/dashboard/users/{user}/edit": {
             "get": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Utilisateurs — édition (Inertia)",
                 "operationId": "adminUsersEdit",
                 "parameters": [
@@ -1021,9 +959,7 @@
         },
         "/dashboard/users/{user}": {
             "delete": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Utilisateurs — supprimer",
                 "description": "`Admin\\UserController@destroy`",
                 "operationId": "adminUsersDestroy",
@@ -1052,9 +988,7 @@
                 ]
             },
             "patch": {
-                "tags": [
-                    "Administration – Interface Inertia"
-                ],
+                "tags": ["Administration – Interface Inertia"],
                 "summary": "Utilisateurs — mettre à jour",
                 "description": "`UpdateManagedUserRequest` — règles métier sur le rôle (dernier super admin, auto-modification, etc.).",
                 "operationId": "adminUsersUpdate",
@@ -1073,11 +1007,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "name",
-                                    "email",
-                                    "role"
-                                ],
+                                "required": ["name", "email", "role"],
                                 "properties": {
                                     "name": {
                                         "type": "string"
@@ -1131,9 +1061,7 @@
         },
         "/up": {
             "get": {
-                "tags": [
-                    "Santé"
-                ],
+                "tags": ["Santé"],
                 "summary": "Santé de l'application",
                 "description": "Contrôle de disponibilité Laravel (health check).",
                 "operationId": "healthCheck",
@@ -1162,9 +1090,7 @@
         },
         "/stripe/webhook": {
             "post": {
-                "tags": [
-                    "Paiements"
-                ],
+                "tags": ["Paiements"],
                 "summary": "Webhook Stripe",
                 "description": "Endpoint appelé par Stripe lors des événements `checkout.session.*`. Le corps doit être la payload brute signée par Stripe. CSRF désactivé pour cette route.",
                 "operationId": "stripeWebhook",
@@ -1223,9 +1149,7 @@
         },
         "/dashboard/ticket-control/verify": {
             "post": {
-                "tags": [
-                    "Contrôle billets (JSON)"
-                ],
+                "tags": ["Contrôle billets (JSON)"],
                 "summary": "Vérifier un billet (scan)",
                 "description": "Vérifie un billet à partir de son QR code sans le marquer comme utilisé. Réservé aux utilisateurs autorisés (`administrateur` / `super_administrateur`).",
                 "operationId": "ticketControlVerify",
@@ -1279,9 +1203,7 @@
         },
         "/dashboard/ticket-control/mark-used": {
             "post": {
-                "tags": [
-                    "Contrôle billets (JSON)"
-                ],
+                "tags": ["Contrôle billets (JSON)"],
                 "summary": "Marquer un billet comme utilisé",
                 "description": "Confirme l'entrée et passe le billet au statut `used` lorsque la réservation est confirmée et le billet valide.",
                 "operationId": "ticketControlMarkUsed",
@@ -1335,9 +1257,7 @@
         },
         "/tickets/{ticket}/qr": {
             "get": {
-                "tags": [
-                    "Billets"
-                ],
+                "tags": ["Billets"],
                 "summary": "Image QR d'un billet",
                 "description": "Retourne l'image PNG du QR code pour un billet appartenant au spectateur connecté.",
                 "operationId": "ticketQrCode",
@@ -1384,9 +1304,7 @@
         },
         "/settings": {
             "get": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Paramètres — redirection vers le profil",
                 "description": "Redirection permanente vers `/settings/profile` (`routes/settings.php`).",
                 "operationId": "settingsRedirect",
@@ -1404,9 +1322,7 @@
         },
         "/settings/profile": {
             "get": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Profil — afficher (Inertia)",
                 "description": "`Settings\\ProfileController@edit` — **Middleware** : `auth`.",
                 "operationId": "settingsProfileEdit",
@@ -1422,9 +1338,7 @@
                 ]
             },
             "delete": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Profil — supprimer le compte",
                 "description": "`Settings\\ProfileController@destroy` — `ProfileDeleteRequest`. **Middleware** : `auth`, `verified`.",
                 "operationId": "settingsProfileDestroy",
@@ -1453,9 +1367,7 @@
                 ]
             },
             "patch": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Profil — mettre à jour",
                 "description": "`ProfileUpdateRequest` (name, email).",
                 "operationId": "settingsProfileUpdate",
@@ -1464,10 +1376,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "name",
-                                    "email"
-                                ],
+                                "required": ["name", "email"],
                                 "properties": {
                                     "name": {
                                         "type": "string",
@@ -1510,9 +1419,7 @@
         },
         "/settings/security": {
             "get": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Sécurité — afficher (Inertia)",
                 "description": "`Settings\\SecurityController@edit` — middleware supplémentaire `RequirePassword`.",
                 "operationId": "settingsSecurityEdit",
@@ -1530,9 +1437,7 @@
         },
         "/settings/password": {
             "put": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Mot de passe — mettre à jour",
                 "description": "`PasswordUpdateRequest` — limitation `throttle:6,1`.",
                 "operationId": "settingsPasswordUpdate",
@@ -1595,9 +1500,7 @@
         },
         "/settings/appearance": {
             "get": {
-                "tags": [
-                    "Paramètres utilisateur"
-                ],
+                "tags": ["Paramètres utilisateur"],
                 "summary": "Apparence — page (Inertia)",
                 "description": "Route `Route::inertia` — composant Vue `settings/Appearance` (thème clair/sombre).",
                 "operationId": "settingsAppearance",
@@ -1617,9 +1520,7 @@
     "components": {
         "schemas": {
             "TicketControlVerifyRequest": {
-                "required": [
-                    "qr_code"
-                ],
+                "required": ["qr_code"],
                 "properties": {
                     "qr_code": {
                         "description": "Code QR du billet (UUID ou identifiant stocké en base).",
@@ -1646,11 +1547,7 @@
                     },
                     "status": {
                         "type": "string",
-                        "enum": [
-                            "valid",
-                            "used",
-                            "cancelled"
-                        ]
+                        "enum": ["valid", "used", "cancelled"]
                     },
                     "film_title": {
                         "type": "string",
@@ -1676,20 +1573,12 @@
                 "type": "object"
             },
             "TicketControlCheckResponse": {
-                "required": [
-                    "outcome",
-                    "message"
-                ],
+                "required": ["outcome", "message"],
                 "properties": {
                     "outcome": {
                         "type": "string",
                         "example": "valid",
-                        "enum": [
-                            "valid",
-                            "invalid",
-                            "cancelled",
-                            "used"
-                        ]
+                        "enum": ["valid", "invalid", "cancelled", "used"]
                     },
                     "message": {
                         "type": "string",
@@ -1703,9 +1592,7 @@
                             {
                                 "type": "object",
                                 "nullable": true,
-                                "enum": [
-                                    null
-                                ]
+                                "enum": [null]
                             }
                         ]
                     },
@@ -1726,9 +1613,7 @@
                     "errors": {
                         "type": "object",
                         "example": {
-                            "qr_code": [
-                                "The qr code field is required."
-                            ]
+                            "qr_code": ["The qr code field is required."]
                         },
                         "additionalProperties": {
                             "type": "array",
@@ -1741,10 +1626,7 @@
                 "type": "object"
             },
             "RoomForm": {
-                "required": [
-                    "name",
-                    "capacity"
-                ],
+                "required": ["name", "capacity"],
                 "properties": {
                     "name": {
                         "type": "string",

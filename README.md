@@ -6,10 +6,10 @@ Studi
 
 LaGrandeCinema expose surtout une interface **Inertia**. Les points d’entrée documentés en OpenAPI sont les routes **JSON, webhook et binaire** réellement présentes dans l’application.
 
-| Ressource | URL |
-|-----------|-----|
-| **Swagger UI** | `/api/documentation` (ex. `http://localhost:8000/api/documentation` avec `php artisan serve` ou l’URL Herd de votre site) |
-| **Fichier OpenAPI** | `/docs?api-docs.json` |
+| Ressource           | URL                                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Swagger UI**      | `/api/documentation` (ex. `http://localhost:8000/api/documentation` avec `php artisan serve` ou l’URL Herd de votre site) |
+| **Fichier OpenAPI** | `/docs?api-docs.json`                                                                                                     |
 
 Régénérer la spec après modification des annotations dans `app/OpenApi/` :
 
@@ -22,6 +22,7 @@ En développement, vous pouvez activer `L5_SWAGGER_GENERATE_ALWAYS=true` dans `.
 **Paquet :** `darkaonline/l5-swagger` **11.4.1** (OpenAPI **3.0**, spec **1.1.0**).
 
 **Contenu documenté :**
+
 - Endpoints **JSON** : contrôle billets, webhook Stripe, QR billet, santé `/up`.
 - **Administration – Interface Inertia** : films, séances, salles, réservations, utilisateurs, page de contrôle.
 - **Tableau de bord** : statistiques (`GET /dashboard?period=today|week|month|year`).
