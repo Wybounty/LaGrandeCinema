@@ -1,0 +1,1753 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "LaGrandeCinema API",
+        "description": "Documentation **OpenAPI 3** de **LaGrandeCinema** (évaluation Studi).\n\n### Deux familles de routes\n1. **Endpoints JSON / machine** (`Contrôle billets (JSON)`, `Paiements`, `Billets`, `Santé`) — corps de réponse structuré.\n2. **Interface Inertia** — pages Vue via `routes/web.php` : réponse `text/html` + props Inertia, ou **redirection** après formulaire.\n\n**Authentification** : session Fortify (`/login`), cookie `laravel_session`, jeton CSRF `X-XSRF-TOKEN` pour les `POST`/`PATCH`/`DELETE` web.\nAucune API REST séparée (`routes/api.php` absent).\n\nLes schémas de corps de requête Inertia reprennent les règles des **Form Requests** existants (pas de champs inventés).",
+        "contact": {
+            "name": "Le Grand Cinéma",
+            "email": "contact@legrandcinema.test"
+        },
+        "version": "1.1.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Développement local (valeur `APP_URL` par défaut)"
+        }
+    ],
+    "paths": {
+        "/dashboard": {
+            "get": {
+                "tags": ["Tableau de bord – Interface Inertia"],
+                "summary": "Tableau de bord et statistiques (Inertia)",
+                "description": "Tableau de bord connecté. **Contrôleur** : `DashboardController@index`.\nSi l'utilisateur peut gérer les utilisateurs (`canManageUsers`), les statistiques sont calculées par `Admin\\StatisticsController::collect()` et passées en prop Inertia `statistics`.\nSpectateurs : page sans bloc statistiques admin.",
+                "operationId": "dashboardIndex",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Période d'agrégation (`App\\StatisticsPeriod`). Valeurs : `today`, `week`, `month`, `year`. Défaut applicatif : `month`.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "month",
+                            "enum": ["today", "week", "month", "year"]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/WebRedirectToLogin"
+                    },
+                    "403": {
+                        "description": "Compte non vérifié (`verified`)."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/films": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Films — liste (Inertia)",
+                "description": "`Admin\\FilmController`@index — liste paginée. **Middleware** : `auth`, `verified`, `manage-users` (`EnsureUserCanManageUsers` — rôle `administrateur` ou `super_administrateur`).\n**Autorisation** : policies Laravel sur le modèle concerné (`authorize` dans le contrôleur ou le Form Request).",
+                "operationId": "adminFilmsIndex",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    },
+                    "403": {
+                        "description": "Non administrateur ou policy `viewAny` refusée."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Films — créer",
+                "description": "`Admin\\FilmController`@store — validation `StoreFilmRequest` (multipart avec affiche).",
+                "operationId": "adminFilmsStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "synopsis",
+                                    "duration",
+                                    "genre",
+                                    "poster"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "synopsis": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "maximum": 600,
+                                        "minimum": 1
+                                    },
+                                    "genre": {
+                                        "description": "Enum `App\\FilmGenre`.",
+                                        "type": "string"
+                                    },
+                                    "poster": {
+                                        "description": "jpeg,jpg,png,webp — max 2048 Ko.",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "403": {
+                        "description": "Policy ou rôle insuffisant."
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/films/create": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Films — formulaire de création (Inertia)",
+                "description": "`Admin\\FilmController`@create — formulaire de création.",
+                "operationId": "adminFilmsCreate",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    },
+                    "403": {
+                        "description": "Policy `create` refusée."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/films/{film}/edit": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Films — formulaire d'édition (Inertia)",
+                "description": "`Admin\\FilmController`@edit",
+                "operationId": "adminFilmsEdit",
+                "parameters": [
+                    {
+                        "name": "film",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    },
+                    "404": {
+                        "description": "Film introuvable."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/films/{film}": {
+            "delete": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Films — supprimer",
+                "description": "`Admin\\FilmController`@destroy — policy `delete`; impossible si des séances existent.",
+                "operationId": "adminFilmsDestroy",
+                "parameters": [
+                    {
+                        "name": "film",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "403": {
+                        "description": "Policy refusée."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Films — mettre à jour",
+                "description": "`Admin\\FilmController`@update — `UpdateFilmRequest`.",
+                "operationId": "adminFilmsUpdate",
+                "parameters": [
+                    {
+                        "name": "film",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "synopsis",
+                                    "duration",
+                                    "genre"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "synopsis": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "integer"
+                                    },
+                                    "genre": {
+                                        "type": "string"
+                                    },
+                                    "poster": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/reservations": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Réservations — liste (Inertia)",
+                "description": "`Admin\\ReservationController@index` — policy `viewAny` sur `Reservation`.",
+                "operationId": "adminReservationsIndex",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/reservations/{reservation}": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Réservations — détail (Inertia)",
+                "description": "`Admin\\ReservationController@show` — détail avec places, billets, statuts.",
+                "operationId": "adminReservationsShow",
+                "parameters": [
+                    {
+                        "name": "reservation",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    },
+                    "403": {
+                        "description": "Policy `view` refusée."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/reservations/{reservation}/cancel": {
+            "post": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Réservations — annuler (redirection)",
+                "description": "`Admin\\ReservationController@cancel` — policy `cancel`. Pas de corps JSON ; action POST Inertia.",
+                "operationId": "adminReservationsCancel",
+                "parameters": [
+                    {
+                        "name": "reservation",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "403": {
+                        "description": "Annulation non autorisée."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/rooms": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Salles — liste (Inertia)",
+                "description": "`Admin\\RoomController@index` — salles et capacité (`capacity` = places).",
+                "operationId": "adminRoomsIndex",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Salles — créer",
+                "description": "`StoreRoomRequest`",
+                "operationId": "adminRoomsStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": ["name", "capacity"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "capacity": {
+                                        "description": "Nombre de places dans la salle.",
+                                        "type": "integer",
+                                        "maximum": 1000,
+                                        "minimum": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/rooms/create": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Salles — formulaire de création (Inertia)",
+                "operationId": "adminRoomsCreate",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/rooms/{room}/edit": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Salles — édition (Inertia)",
+                "operationId": "adminRoomsEdit",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/rooms/{room}": {
+            "delete": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Salles — supprimer",
+                "operationId": "adminRoomsDestroy",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Salles — mettre à jour",
+                "description": "`UpdateRoomRequest`",
+                "operationId": "adminRoomsUpdate",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RoomForm"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/sessions": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Séances — liste (Inertia)",
+                "description": "`Admin\\CinemaSessionController`@index",
+                "operationId": "adminSessionsIndex",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Séances — créer",
+                "description": "`Admin\\CinemaSessionController`@store — `CinemaSessionRequest` (+ contraintes d'horaires via `ValidatesCinemaSessionSchedule`).",
+                "operationId": "adminSessionsStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "film_id",
+                                    "room_id",
+                                    "session_date",
+                                    "start_time",
+                                    "end_time",
+                                    "starts_at",
+                                    "ends_at"
+                                ],
+                                "properties": {
+                                    "film_id": {
+                                        "description": "exists:films,id",
+                                        "type": "integer"
+                                    },
+                                    "room_id": {
+                                        "description": "exists:rooms,id",
+                                        "type": "integer"
+                                    },
+                                    "session_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "start_time": {
+                                        "description": "format H:i",
+                                        "type": "string",
+                                        "example": "19:30"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "21:45"
+                                    },
+                                    "starts_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "ends_at": {
+                                        "description": "after:starts_at",
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/sessions/create": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Séances — formulaire de création (Inertia)",
+                "description": "`Admin\\CinemaSessionController`@create",
+                "operationId": "adminSessionsCreate",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/sessions/{cinemaSession}/edit": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Séances — édition (Inertia)",
+                "operationId": "adminSessionsEdit",
+                "parameters": [
+                    {
+                        "name": "cinemaSession",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/sessions/{cinemaSession}": {
+            "delete": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Séances — supprimer",
+                "description": "`Admin\\CinemaSessionController`@destroy",
+                "operationId": "adminSessionsDestroy",
+                "parameters": [
+                    {
+                        "name": "cinemaSession",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Séances — mettre à jour",
+                "operationId": "adminSessionsUpdate",
+                "parameters": [
+                    {
+                        "name": "cinemaSession",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CinemaSessionForm"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/ticket-control": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Contrôle billets — interface (Inertia)",
+                "description": "`Admin\\\\TicketControlController@index` — écran de scan (Inertia).\nLes actions JSON de vérification sont documentées séparément (`Contrôle billets (JSON)`).",
+                "operationId": "adminTicketControlIndex",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    },
+                    "403": {
+                        "description": "Policy `checkAtEntrance` refusée."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/users": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Utilisateurs — liste (Inertia)",
+                "description": "`Admin\\UserController@index`",
+                "operationId": "adminUsersIndex",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Utilisateurs — créer",
+                "description": "`StoreManagedUserRequest` — rôles selon le créateur (`spectateur`, `administrateur`, optionnel `super_administrateur`).",
+                "operationId": "adminUsersStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "spectateur",
+                                            "administrateur",
+                                            "super_administrateur"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/users/create": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Utilisateurs — formulaire de création (Inertia)",
+                "operationId": "adminUsersCreate",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/users/{user}/edit": {
+            "get": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Utilisateurs — édition (Inertia)",
+                "operationId": "adminUsersEdit",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/users/{user}": {
+            "delete": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Utilisateurs — supprimer",
+                "description": "`Admin\\UserController@destroy`",
+                "operationId": "adminUsersDestroy",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": ["Administration – Interface Inertia"],
+                "summary": "Utilisateurs — mettre à jour",
+                "description": "`UpdateManagedUserRequest` — règles métier sur le rôle (dernier super admin, auto-modification, etc.).",
+                "operationId": "adminUsersUpdate",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": ["name", "email", "role"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "nullable": true
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/up": {
+            "get": {
+                "tags": ["Santé"],
+                "summary": "Santé de l'application",
+                "description": "Contrôle de disponibilité Laravel (health check).",
+                "operationId": "healthCheck",
+                "responses": {
+                    "200": {
+                        "description": "Application opérationnelle.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Application indisponible."
+                    }
+                }
+            }
+        },
+        "/stripe/webhook": {
+            "post": {
+                "tags": ["Paiements"],
+                "summary": "Webhook Stripe",
+                "description": "Endpoint appelé par Stripe lors des événements `checkout.session.*`. Le corps doit être la payload brute signée par Stripe. CSRF désactivé pour cette route.",
+                "operationId": "stripeWebhook",
+                "requestBody": {
+                    "description": "Événement JSON Stripe (payload brut).",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Événement accepté.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "OK"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Signature ou payload invalide.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Invalid signature"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Secret webhook non configuré côté application.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Webhook secret not configured"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "stripeSignature": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/ticket-control/verify": {
+            "post": {
+                "tags": ["Contrôle billets (JSON)"],
+                "summary": "Vérifier un billet (scan)",
+                "description": "Vérifie un billet à partir de son QR code sans le marquer comme utilisé. Réservé aux utilisateurs autorisés (`administrateur` / `super_administrateur`).",
+                "operationId": "ticketControlVerify",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TicketControlVerifyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Résultat de la vérification (toujours HTTP 200 pour un QR analysable).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TicketControlCheckResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Utilisateur non authentifié."
+                    },
+                    "403": {
+                        "description": "Spectateur ou rôle non autorisé."
+                    },
+                    "422": {
+                        "description": "Erreur de validation (`qr_code` requis, 255 caractères max).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/ticket-control/mark-used": {
+            "post": {
+                "tags": ["Contrôle billets (JSON)"],
+                "summary": "Marquer un billet comme utilisé",
+                "description": "Confirme l'entrée et passe le billet au statut `used` lorsque la réservation est confirmée et le billet valide.",
+                "operationId": "ticketControlMarkUsed",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TicketControlVerifyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Entrée confirmée ou refus documenté dans le corps JSON.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TicketControlCheckResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Utilisateur non authentifié."
+                    },
+                    "403": {
+                        "description": "Spectateur ou rôle non autorisé."
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/tickets/{ticket}/qr": {
+            "get": {
+                "tags": ["Billets"],
+                "summary": "Image QR d'un billet",
+                "description": "Retourne l'image PNG du QR code pour un billet appartenant au spectateur connecté.",
+                "operationId": "ticketQrCode",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "Identifiant du billet.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image PNG du QR code.",
+                        "content": {
+                            "image/png": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Utilisateur non authentifié."
+                    },
+                    "403": {
+                        "description": "Billet d'un autre utilisateur ou rôle inadapté."
+                    },
+                    "404": {
+                        "description": "Billet introuvable."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/settings": {
+            "get": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Paramètres — redirection vers le profil",
+                "description": "Redirection permanente vers `/settings/profile` (`routes/settings.php`).",
+                "operationId": "settingsRedirect",
+                "responses": {
+                    "302": {
+                        "description": "Redirection vers `/settings/profile`."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/settings/profile": {
+            "get": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Profil — afficher (Inertia)",
+                "description": "`Settings\\ProfileController@edit` — **Middleware** : `auth`.",
+                "operationId": "settingsProfileEdit",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Profil — supprimer le compte",
+                "description": "`Settings\\ProfileController@destroy` — `ProfileDeleteRequest`. **Middleware** : `auth`, `verified`.",
+                "operationId": "settingsProfileDestroy",
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Profil — mettre à jour",
+                "description": "`ProfileUpdateRequest` (name, email).",
+                "operationId": "settingsProfileUpdate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": ["name", "email"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/settings/security": {
+            "get": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Sécurité — afficher (Inertia)",
+                "description": "`Settings\\SecurityController@edit` — middleware supplémentaire `RequirePassword`.",
+                "operationId": "settingsSecurityEdit",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        },
+        "/settings/password": {
+            "put": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Mot de passe — mettre à jour",
+                "description": "`PasswordUpdateRequest` — limitation `throttle:6,1`.",
+                "operationId": "settingsPasswordUpdate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "$ref": "#/components/responses/WebRedirect"
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Trop de tentatives (throttle)."
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "csrfToken": []
+                    }
+                ]
+            }
+        },
+        "/settings/appearance": {
+            "get": {
+                "tags": ["Paramètres utilisateur"],
+                "summary": "Apparence — page (Inertia)",
+                "description": "Route `Route::inertia` — composant Vue `settings/Appearance` (thème clair/sombre).",
+                "operationId": "settingsAppearance",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/InertiaPage"
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "TicketControlVerifyRequest": {
+                "required": ["qr_code"],
+                "properties": {
+                    "qr_code": {
+                        "description": "Code QR du billet (UUID ou identifiant stocké en base).",
+                        "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "TicketPayload": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "qr_code": {
+                        "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    "place_number": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": ["valid", "used", "cancelled"]
+                    },
+                    "film_title": {
+                        "type": "string",
+                        "example": "Le Voyage extraordinaire"
+                    },
+                    "session_starts_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-11-20T19:30:00-04:00",
+                        "nullable": true
+                    },
+                    "session_ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-11-20T21:45:00-04:00",
+                        "nullable": true
+                    },
+                    "room_name": {
+                        "type": "string",
+                        "example": "Salle 1"
+                    }
+                },
+                "type": "object"
+            },
+            "TicketControlCheckResponse": {
+                "required": ["outcome", "message"],
+                "properties": {
+                    "outcome": {
+                        "type": "string",
+                        "example": "valid",
+                        "enum": ["valid", "invalid", "cancelled", "used"]
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Billet valide. Vous pouvez confirmer l'entrée."
+                    },
+                    "ticket": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/TicketPayload"
+                            },
+                            {
+                                "type": "object",
+                                "nullable": true,
+                                "enum": [null]
+                            }
+                        ]
+                    },
+                    "success": {
+                        "description": "Présent uniquement lors de la confirmation d'entrée réussie (`mark-used`).",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The qr code field is required."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "qr_code": ["The qr code field is required."]
+                        },
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "RoomForm": {
+                "required": ["name", "capacity"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 1000,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "CinemaSessionForm": {
+                "required": [
+                    "film_id",
+                    "room_id",
+                    "session_date",
+                    "start_time",
+                    "end_time",
+                    "starts_at",
+                    "ends_at"
+                ],
+                "properties": {
+                    "film_id": {
+                        "type": "integer"
+                    },
+                    "room_id": {
+                        "type": "integer"
+                    },
+                    "session_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "example": "19:30"
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "example": "21:45"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "InertiaPage": {
+                "description": "**Page Inertia (interface Vue)** — ce n’est pas un endpoint JSON.\nRéponse HTML avec en-têtes `X-Inertia` / `X-Inertia-Version` et un objet `page` (composant + props) côté client.\nLes tests Pest utilisent `assertInertia()` sur ces routes.",
+                "content": {
+                    "text/html": {
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "WebRedirect": {
+                "description": "Redirection HTTP après mutation réussie (formulaire Inertia). Flash toast éventuel en session."
+            },
+            "WebRedirectToLogin": {
+                "description": "Redirection vers la connexion lorsque l’utilisateur n’est pas authentifié (401 implicite)."
+            }
+        },
+        "securitySchemes": {
+            "sessionCookie": {
+                "type": "apiKey",
+                "description": "Session Laravel établie après connexion Fortify (`/login`).",
+                "name": "laravel_session",
+                "in": "cookie"
+            },
+            "csrfToken": {
+                "type": "apiKey",
+                "description": "Jeton CSRF Laravel (header requis pour les `POST` web hors webhook).",
+                "name": "X-XSRF-TOKEN",
+                "in": "header"
+            },
+            "stripeSignature": {
+                "type": "apiKey",
+                "description": "Signature Stripe fournie par Stripe sur chaque événement webhook.",
+                "name": "Stripe-Signature",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Santé",
+            "description": "Disponibilité de l'application"
+        },
+        {
+            "name": "Contrôle billets (JSON)",
+            "description": "Endpoints JSON de scan (distincts des pages Inertia)"
+        },
+        {
+            "name": "Billets",
+            "description": "Ressources billets pour les spectateurs authentifiés"
+        },
+        {
+            "name": "Paiements",
+            "description": "Intégration Stripe (webhook serveur à serveur)"
+        },
+        {
+            "name": "Administration – Interface Inertia",
+            "description": "Back-office cinéma : films, séances, salles, réservations, utilisateurs, contrôle entrée (pages Vue)"
+        },
+        {
+            "name": "Tableau de bord – Interface Inertia",
+            "description": "Accueil connecté et statistiques agrégées"
+        },
+        {
+            "name": "Paramètres utilisateur",
+            "description": "Profil, sécurité, apparence (Inertia)"
+        }
+    ]
+}

@@ -48,3 +48,21 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+use App\Models\User;
+use Illuminate\Auth\Notifications\VerifyEmail;
+
+/**
+ * URL signée de vérification d'e-mail, identique à celle produite par la notification Laravel.
+ *
+ * Délègue à {@see VerifyEmail::verificationUrl()} (empreinte SHA-1 requise par Fortify/Laravel).
+ */
+function laravelEmailVerificationUrl(User $user): string
+{
+    $notification = new VerifyEmail;
+
+    $method = new ReflectionMethod(VerifyEmail::class, 'verificationUrl');
+    $method->setAccessible(true);
+
+    return $method->invoke($notification, $user);
+}

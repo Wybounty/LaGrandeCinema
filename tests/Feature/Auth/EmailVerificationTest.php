@@ -3,7 +3,6 @@
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\URL;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -31,11 +30,7 @@ test('email can be verified', function () {
 
     Event::fake();
 
-    $verificationUrl = URL::temporarySignedRoute(
-        'verification.verify',
-        now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)],
-    );
+    $verificationUrl = laravelEmailVerificationUrl($user);
 
     $response = $this->actingAs($user)->get($verificationUrl);
 
@@ -50,11 +45,10 @@ test('email is not verified with invalid hash', function () {
 
     Event::fake();
 
-    $verificationUrl = URL::temporarySignedRoute(
-        'verification.verify',
-        now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1('wrong-email')],
-    );
+    $notifiableWithWrongHash = User::factory()->make(['email' => 'wrong-email']);
+    $notifiableWithWrongHash->id = $user->id;
+
+    $verificationUrl = laravelEmailVerificationUrl($notifiableWithWrongHash);
 
     $this->actingAs($user)->get($verificationUrl);
 
@@ -67,11 +61,10 @@ test('email is not verified with invalid user id', function () {
 
     Event::fake();
 
-    $verificationUrl = URL::temporarySignedRoute(
-        'verification.verify',
-        now()->addMinutes(60),
-        ['id' => 123, 'hash' => sha1($user->email)],
-    );
+    $notifiableWithMismatchedId = User::factory()->make(['email' => $user->email]);
+    $notifiableWithMismatchedId->id = 123;
+
+    $verificationUrl = laravelEmailVerificationUrl($notifiableWithMismatchedId);
 
     $this->actingAs($user)->get($verificationUrl);
 
@@ -95,11 +88,7 @@ test('already verified user visiting verification link is redirected without fir
 
     Event::fake();
 
-    $verificationUrl = URL::temporarySignedRoute(
-        'verification.verify',
-        now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)],
-    );
+    $verificationUrl = laravelEmailVerificationUrl($user);
 
     $this->actingAs($user)->get($verificationUrl)
         ->assertRedirect(route('dashboard', absolute: false).'?verified=1');
